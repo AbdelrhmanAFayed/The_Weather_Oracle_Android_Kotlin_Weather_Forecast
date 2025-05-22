@@ -25,67 +25,87 @@ class WeatherRepositoryImp private constructor(
             }
     }
 
-    override suspend fun fetchWeatherForecast(latitude: Double, longitude: Double): WeatherForecastResponse? =
-        withContext(Dispatchers.IO) {
-            try {
-                remoteDataSource.getWeatherForecast(latitude, longitude)
-            } catch (e: IOException) {
-                e.printStackTrace()
-                null
-            } catch (e: HttpException) {
-                e.printStackTrace()
-                null
-            } catch (e: Exception) {
-                e.printStackTrace()
-                null
-            }
+    override suspend fun fetchWeatherForecast(
+        latitude: Double,
+        longitude: Double,
+        units: String?,
+        mode: String?,
+        cnt: Int?,
+        lang: String?
+    ): WeatherForecastResponse? = withContext(Dispatchers.IO) {
+        try {
+            remoteDataSource.getWeatherForecast(latitude, longitude, units, mode, cnt, lang)
+        } catch (e: IOException) {
+            e.printStackTrace()
+            null
+        } catch (e: HttpException) {
+            e.printStackTrace()
+            null
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
         }
+    }
 
-    override suspend fun fetchForecastByCityId(cityId: Int): WeatherForecastResponse? =
-        withContext(Dispatchers.IO) {
-            try {
-                remoteDataSource.getForecastByCityId(cityId)
-            } catch (e: IOException) {
-                e.printStackTrace()
-                null
-            } catch (e: HttpException) {
-                e.printStackTrace()
-                null
-            } catch (e: Exception) {
-                e.printStackTrace()
-                null
-            }
+    override suspend fun fetchForecastByCityId(
+        cityId: Int,
+        units: String?,
+        mode: String?,
+        cnt: Int?,
+        lang: String?
+    ): WeatherForecastResponse? = withContext(Dispatchers.IO) {
+        try {
+            remoteDataSource.getForecastByCityId(cityId, units, mode, cnt, lang)
+        } catch (e: IOException) {
+            e.printStackTrace()
+            null
+        } catch (e: HttpException) {
+            e.printStackTrace()
+            null
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
         }
+    }
 
-    override suspend fun fetchWeatherByLatLon(latitude: Double, longitude: Double): WeatherResponse? =
-        withContext(Dispatchers.IO) {
-            try {
-                remoteDataSource.getWeatherByLatLon(latitude, longitude)
-            } catch (e: IOException) {
-                e.printStackTrace()
-                null
-            } catch (e: HttpException) {
-                e.printStackTrace()
-                null
-            } catch (e: Exception) {
-                e.printStackTrace()
-                null
-            }
+    override suspend fun fetchWeatherByLatLon(
+        latitude: Double,
+        longitude: Double,
+        units: String?,
+        mode: String?,
+        lang: String?
+    ): WeatherResponse? = withContext(Dispatchers.IO) {
+        try {
+            remoteDataSource.getWeatherByLatLon(latitude, longitude, units, mode, lang)
+        } catch (e: IOException) {
+            e.printStackTrace()
+            null
+        } catch (e: HttpException) {
+            e.printStackTrace()
+            null
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
         }
+    }
 
-    override suspend fun fetchWeatherByCityId(cityId: Int): WeatherResponse? =
-        withContext(Dispatchers.IO) {
-            try {
-                remoteDataSource.getWeatherByCityId(cityId)
-            } catch (e: IOException) {
-                e.printStackTrace()
-                null
-            } catch (e: HttpException) {
-                e.printStackTrace()
-                null
-            } catch (e: Exception) {
-                e.printStackTrace()
-                null
-            }
+    override suspend fun fetchWeatherByCityId(
+        cityId: Int,
+        units: String?,
+        mode: String?,
+        lang: String?
+    ): WeatherResponse? = withContext(Dispatchers.IO) {
+        try {
+            remoteDataSource.getWeatherByCityId(cityId, units, mode, lang)
+        } catch (e: IOException) {
+            e.printStackTrace()
+            null
+        } catch (e: HttpException) {
+            e.printStackTrace()
+            null
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
         }
+    }
 }

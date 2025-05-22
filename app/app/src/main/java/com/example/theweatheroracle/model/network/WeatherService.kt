@@ -11,25 +11,39 @@ interface WeatherService {
     suspend fun getWeatherForecast(
         @Query("lat") latitude: Double,
         @Query("lon") longitude: Double,
-        @Query("appid") apiKey: String = BuildConfig.OPENWEATHER_API_KEY
+        @Query("appid") apiKey: String = BuildConfig.OPENWEATHER_API_KEY,
+        @Query("units") units: String? = "standard",
+        @Query("mode") mode: String? = "json",
+        @Query("cnt") cnt: Int? = null,
+        @Query("lang") lang: String? = null
     ): WeatherForecastResponse
 
     @GET("forecast")
-    suspend fun getForecastByCityId(
+    suspend fun getWeatherForecastByCityId(
         @Query("id") cityId: Int,
-        @Query("appid") apiKey: String = BuildConfig.OPENWEATHER_API_KEY
+        @Query("appid") apiKey: String = BuildConfig.OPENWEATHER_API_KEY,
+        @Query("units") units: String? = "standard",
+        @Query("mode") mode: String? = "json",
+        @Query("cnt") cnt: Int? = null,
+        @Query("lang") lang: String? = null
     ): WeatherForecastResponse
 
     @GET("weather")
     suspend fun getWeatherByLatLon(
         @Query("lat") latitude: Double,
         @Query("lon") longitude: Double,
-        @Query("appid") apiKey: String = BuildConfig.OPENWEATHER_API_KEY
+        @Query("appid") apiKey: String = BuildConfig.OPENWEATHER_API_KEY,
+        @Query("units") units: String? = "standard",
+        @Query("mode") mode: String? = "json",
+        @Query("lang") lang: String? = null
     ): WeatherResponse
 
     @GET("weather")
-    suspend fun getWeatherByCityId(
+    suspend fun getCurrentWeatherByCityId(
         @Query("id") cityId: Int,
-        @Query("appid") apiKey: String = BuildConfig.OPENWEATHER_API_KEY
+        @Query("appid") apiKey: String = BuildConfig.OPENWEATHER_API_KEY,
+        @Query("units") units: String? = "standard",
+        @Query("mode") mode: String? = "json",
+        @Query("lang") lang: String? = null
     ): WeatherResponse
 }
