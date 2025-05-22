@@ -4,35 +4,43 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#1A1B1D"
+    android:background="@android:color/transparent"
     tools:context=".NavActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:padding="16dp">
 
+        <!-- City and Weather Info -->
         <TextView
             android:id="@+id/cityNameText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="48dp"
+            android:shadowColor="#80000000"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="2"
             android:textAlignment="center"
             android:textColor="@color/white"
-            android:textSize="25sp"
+            android:textSize="30sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="Giza"
-            tools:ignore="TextSizeCheck" />
+            tools:ignore="TextSizeCheck"
+            tools:text="Giza" />
 
         <TextView
             android:id="@+id/weatherDescText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@drawable/rounded_text_background"
+            android:padding="8dp"
             android:textAlignment="center"
-            android:textColor="@color/white"
-            android:textSize="18sp"
+            android:textColor="@color/light_gray"
+            android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/cityNameText"
@@ -40,10 +48,11 @@
 
         <ImageView
             android:id="@+id/weatherIcon"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_marginTop="16dp"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_marginTop="24dp"
             android:contentDescription="Weather icon"
+            android:scaleType="centerCrop"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/weatherDescText"
@@ -53,22 +62,28 @@
             android:id="@+id/currentTempText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="16dp"
+            android:shadowColor="#80000000"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="3"
             android:textAlignment="center"
             android:textColor="@color/white"
-            android:textSize="48sp"
+            android:textSize="60sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/weatherIcon"
-            tools:text="304.52 K"
-            tools:ignore="SmallSp" />
+            tools:ignore="SmallSp"
+            tools:text="304.52 K" />
 
+        <!-- Weather Cards ScrollView -->
         <HorizontalScrollView
             android:id="@+id/weatherScrollView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="32dp"
+            android:overScrollMode="never"
             android:scrollbars="none"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -77,31 +92,35 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:padding="8dp">
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/humidityCard"
                     android:layout_width="120dp"
-                    android:layout_height="120dp"
-                    android:layout_marginStart="15dp"
-                    android:layout_marginTop="20dp"
-                    app:cardBackgroundColor="#802196F3"
-                    app:cardCornerRadius="30dp"
-                    app:cardElevation="0dp">
+                    android:layout_height="140dp"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="16dp"
+                    app:cardBackgroundColor="@color/card_base_color"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="8dp"
+                    app:cardPreventCornerOverlap="false">
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent">
+                        android:layout_height="match_parent"
+                        android:background="@drawable/card_gradient"
+                        android:padding="8dp">
 
                         <TextView
                             android:id="@+id/humidityLabel"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="16dp"
-                            android:layout_marginStart="16dp"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginTop="8dp"
                             android:text="Humidity"
-                            android:textColor="#80FFFFFF"
-                            android:textSize="18sp"
+                            android:textColor="#B3FFFFFF"
+                            android:textSize="16sp"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
@@ -110,12 +129,13 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textColor="@color/white"
-                            android:textSize="48sp"
+                            android:textSize="32sp"
+                            android:textStyle="bold"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/humidityLabel"
-                            app:layout_constraintVertical_bias="0.444"
+                            app:layout_constraintVertical_bias="0.4"
                             tools:text="57%" />
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -124,26 +144,29 @@
                 <androidx.cardview.widget.CardView
                     android:id="@+id/windCard"
                     android:layout_width="120dp"
-                    android:layout_height="120dp"
-                    android:layout_marginStart="15dp"
-                    android:layout_marginTop="20dp"
-                    app:cardBackgroundColor="#802196F3"
-                    app:cardCornerRadius="30dp"
-                    app:cardElevation="0dp">
+                    android:layout_height="140dp"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="16dp"
+                    app:cardBackgroundColor="@color/card_base_color"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="8dp"
+                    app:cardPreventCornerOverlap="false">
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent">
+                        android:layout_height="match_parent"
+                        android:background="@drawable/card_gradient"
+                        android:padding="8dp">
 
                         <TextView
                             android:id="@+id/windLabel"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="16dp"
-                            android:layout_marginStart="16dp"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginTop="8dp"
                             android:text="Wind"
-                            android:textColor="#80FFFFFF"
-                            android:textSize="18sp"
+                            android:textColor="#B3FFFFFF"
+                            android:textSize="16sp"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
@@ -153,11 +176,12 @@
                             android:layout_height="wrap_content"
                             android:textColor="@color/white"
                             android:textSize="24sp"
+                            android:textStyle="bold"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/windLabel"
-                            app:layout_constraintVertical_bias="0.444"
+                            app:layout_constraintVertical_bias="0.4"
                             tools:text="5.14 m/s" />
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -166,26 +190,29 @@
                 <androidx.cardview.widget.CardView
                     android:id="@+id/pressureCard"
                     android:layout_width="120dp"
-                    android:layout_height="120dp"
-                    android:layout_marginStart="15dp"
-                    android:layout_marginTop="20dp"
-                    app:cardBackgroundColor="#802196F3"
-                    app:cardCornerRadius="30dp"
-                    app:cardElevation="0dp">
+                    android:layout_height="140dp"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="16dp"
+                    app:cardBackgroundColor="@color/card_base_color"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="8dp"
+                    app:cardPreventCornerOverlap="false">
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent">
+                        android:layout_height="match_parent"
+                        android:background="@drawable/card_gradient"
+                        android:padding="8dp">
 
                         <TextView
                             android:id="@+id/pressureLabel"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="16dp"
-                            android:layout_marginStart="16dp"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginTop="8dp"
                             android:text="Pressure"
-                            android:textColor="#80FFFFFF"
-                            android:textSize="18sp"
+                            android:textColor="#B3FFFFFF"
+                            android:textSize="16sp"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
@@ -195,11 +222,12 @@
                             android:layout_height="wrap_content"
                             android:textColor="@color/white"
                             android:textSize="20sp"
+                            android:textStyle="bold"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/pressureLabel"
-                            app:layout_constraintVertical_bias="0.444"
+                            app:layout_constraintVertical_bias="0.4"
                             tools:text="1500 hPa" />
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -208,26 +236,29 @@
                 <androidx.cardview.widget.CardView
                     android:id="@+id/cloudsCard"
                     android:layout_width="120dp"
-                    android:layout_height="120dp"
-                    android:layout_marginStart="15dp"
-                    android:layout_marginTop="20dp"
-                    app:cardBackgroundColor="#802196F3"
-                    app:cardCornerRadius="30dp"
-                    app:cardElevation="0dp">
+                    android:layout_height="140dp"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="16dp"
+                    app:cardBackgroundColor="@color/card_base_color"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="8dp"
+                    app:cardPreventCornerOverlap="false">
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent">
+                        android:layout_height="match_parent"
+                        android:background="@drawable/card_gradient"
+                        android:padding="8dp">
 
                         <TextView
                             android:id="@+id/cloudsLabel"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="16dp"
-                            android:layout_marginStart="16dp"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginTop="8dp"
                             android:text="Clouds"
-                            android:textColor="#80FFFFFF"
-                            android:textSize="18sp"
+                            android:textColor="#B3FFFFFF"
+                            android:textSize="16sp"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
@@ -236,12 +267,13 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textColor="@color/white"
-                            android:textSize="40sp"
+                            android:textSize="28sp"
+                            android:textStyle="bold"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/cloudsLabel"
-                            app:layout_constraintVertical_bias="0.444"
+                            app:layout_constraintVertical_bias="0.4"
                             tools:text="20%" />
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -250,27 +282,30 @@
                 <androidx.cardview.widget.CardView
                     android:id="@+id/rainCard"
                     android:layout_width="120dp"
-                    android:layout_height="120dp"
-                    android:layout_marginStart="15dp"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginEnd="15dp"
-                    app:cardBackgroundColor="#802196F3"
-                    app:cardCornerRadius="30dp"
-                    app:cardElevation="0dp">
+                    android:layout_height="140dp"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="12dp"
+                    app:cardBackgroundColor="@color/card_base_color"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="8dp"
+                    app:cardPreventCornerOverlap="false">
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent">
+                        android:layout_height="match_parent"
+                        android:background="@drawable/card_gradient"
+                        android:padding="8dp">
 
                         <TextView
                             android:id="@+id/rainLabel"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="16dp"
-                            android:layout_marginTop="16dp"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginTop="8dp"
                             android:text="Rain"
-                            android:textColor="#80FFFFFF"
-                            android:textSize="18sp"
+                            android:textColor="#B3FFFFFF"
+                            android:textSize="16sp"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
@@ -280,11 +315,12 @@
                             android:layout_height="wrap_content"
                             android:textColor="@color/white"
                             android:textSize="24sp"
+                            android:textStyle="bold"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/rainLabel"
-                            app:layout_constraintVertical_bias="0.444"
+                            app:layout_constraintVertical_bias="0.4"
                             tools:text="1.0 mm" />
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -293,30 +329,35 @@
             </LinearLayout>
         </HorizontalScrollView>
 
+        <!-- Daily Forecast Card -->
         <androidx.cardview.widget.CardView
             android:id="@+id/dailyForecastCard"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
             android:layout_marginStart="16dp"
+            android:layout_marginTop="24dp"
             android:layout_marginEnd="16dp"
-            app:cardBackgroundColor="#802196F3"
-            app:cardCornerRadius="15dp"
-            app:cardElevation="0dp"
+            app:cardBackgroundColor="@color/card_base_color"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/weatherScrollView">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:background="@drawable/card_gradient"
+                android:padding="8dp">
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/dailyForecastList"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="160dp"
                     android:layout_marginTop="8dp"
+                    android:clipToPadding="false"
                     android:orientation="horizontal"
+                    android:paddingHorizontal="4dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -324,24 +365,27 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.cardview.widget.CardView>
 
+        <!-- Weekly Forecast Card -->
         <androidx.cardview.widget.CardView
             android:id="@+id/weeklyForecastCard"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
             android:layout_marginStart="16dp"
+            android:layout_marginTop="24dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
-            app:cardBackgroundColor="#802196F3"
-            app:cardCornerRadius="15dp"
-            app:cardElevation="0dp"
+            app:cardBackgroundColor="@color/card_base_color"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/dailyForecastCard">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:background="@drawable/card_gradient"
+                android:padding="8dp">
 
                 <TextView
                     android:id="@+id/weeklyForecastTitle"
@@ -350,8 +394,9 @@
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
                     android:text="5-day-Forecast"
-                    android:textColor="#80FFFFFF"
+                    android:textColor="#B3FFFFFF"
                     android:textSize="18sp"
+                    android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -360,7 +405,9 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
+                    android:clipToPadding="false"
                     android:nestedScrollingEnabled="false"
+                    android:paddingHorizontal="4dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/weeklyForecastTitle"
