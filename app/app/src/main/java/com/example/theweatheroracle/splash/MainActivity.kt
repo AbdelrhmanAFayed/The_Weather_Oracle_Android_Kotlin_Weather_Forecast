@@ -1,13 +1,13 @@
-package com.example.theweatheroracle
+package com.example.theweatheroracle.splash
 
+import android.animation.Animator
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.airbnb.lottie.LottieAnimationView
+import com.example.theweatheroracle.nav.NavActivity
+import com.example.theweatheroracle.R
 
 class MainActivity : AppCompatActivity() {
     @SuppressLint("MissingInflatedId")
@@ -21,14 +21,14 @@ class MainActivity : AppCompatActivity() {
 
         lottieAnimationView.playAnimation()
 
-        lottieAnimationView.addAnimatorListener(object : android.animation.Animator.AnimatorListener {
-            override fun onAnimationStart(animation: android.animation.Animator) {}
-            override fun onAnimationEnd(animation: android.animation.Animator) {
+        lottieAnimationView.addAnimatorListener(object : Animator.AnimatorListener {
+            override fun onAnimationStart(animation: Animator) {}
+            override fun onAnimationEnd(animation: Animator) {
                 startActivity(Intent(this@MainActivity, NavActivity::class.java))
                 finish()
             }
-            override fun onAnimationCancel(animation: android.animation.Animator) {}
-            override fun onAnimationRepeat(animation: android.animation.Animator) {}
+            override fun onAnimationCancel(animation: Animator) {}
+            override fun onAnimationRepeat(animation: Animator) {}
         })
 
 
