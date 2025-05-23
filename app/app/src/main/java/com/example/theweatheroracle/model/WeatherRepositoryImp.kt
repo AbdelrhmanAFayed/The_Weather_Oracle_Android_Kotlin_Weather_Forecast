@@ -1,11 +1,9 @@
 package com.example.theweatheroracle.model
 
 import com.example.theweatheroracle.model.db.WeatherLocalDataSource
-import com.example.theweatheroracle.model.network.WeatherRemoteDataSource
+import com.example.theweatheroracle.model.api.WeatherRemoteDataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import retrofit2.HttpException
-import java.io.IOException
 
 class WeatherRepositoryImp private constructor(
     private val remoteDataSource: WeatherRemoteDataSource,
