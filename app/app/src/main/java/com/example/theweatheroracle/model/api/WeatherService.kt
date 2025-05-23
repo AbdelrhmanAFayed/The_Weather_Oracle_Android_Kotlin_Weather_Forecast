@@ -1,4 +1,4 @@
-package com.example.theweatheroracle.model.network
+package com.example.theweatheroracle.model.api
 
 import com.example.theweatheroracle.BuildConfig
 import com.example.theweatheroracle.model.WeatherForecastResponse

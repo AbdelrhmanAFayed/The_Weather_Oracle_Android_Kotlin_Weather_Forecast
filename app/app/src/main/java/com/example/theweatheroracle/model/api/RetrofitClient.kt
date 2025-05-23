@@ -1,4 +1,4 @@
-package com.example.theweatheroracle.model.network
+package com.example.theweatheroracle.model.api
 
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
