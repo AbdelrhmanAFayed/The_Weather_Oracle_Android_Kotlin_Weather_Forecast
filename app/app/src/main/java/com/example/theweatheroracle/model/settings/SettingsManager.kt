@@ -6,25 +6,26 @@ import androidx.core.content.edit
 
 class SettingsManager(private val context: Context) : ISettingsManager {
     companion object {
-        private const val PREFS_NAME = "WeatherOraclePrefs"
-        private const val KEY_FIRST_TIME = "first_time"
-        private const val KEY_LOCATION_PERMISSION = "location_permission"
-        private const val KEY_LOCATION = "location"
-        private const val KEY_LANGUAGE = "language"
-        private const val KEY_TEMPERATURE = "temperature"
-        private const val KEY_WIND_SPEED = "wind_speed"
-        private const val KEY_NOTIFICATIONS = "notifications"
-        private const val KEY_CHOSEN_CITY = "chosen_city"
-
-        private const val DEFAULT_FIRST_TIME = true
-        private const val DEFAULT_LOCATION_PERMISSION = false
-        private const val DEFAULT_LOCATION = "gps"
-        private const val DEFAULT_LANGUAGE = "english"
-        private const val DEFAULT_TEMPERATURE = "celsius"
-        private const val DEFAULT_WIND_SPEED = "ms"
-        private const val DEFAULT_NOTIFICATIONS = "enable"
-        private const val DEFAULT_CHOSEN_CITY = ""
-    }
+    private const val PREFS_NAME = "WeatherOraclePrefs"
+    private const val KEY_FIRST_TIME = "first_time"
+    private const val KEY_LOCATION_PERMISSION = "location_permission"
+    private const val KEY_LOCATION = "location"
+    private const val KEY_LANGUAGE = "language"
+    private const val KEY_TEMPERATURE = "temperature"
+    private const val KEY_WIND_SPEED = "wind_speed"
+    private const val KEY_NOTIFICATIONS = "notifications"
+    private const val KEY_CHOSEN_CITY = "chosen_city"
+    private const val KEY_LATITUDE = "latitude"
+    private const val KEY_LONGITUDE = "longitude"
+    private const val DEFAULT_FIRST_TIME = true
+    private const val DEFAULT_LOCATION_PERMISSION = false
+    private const val DEFAULT_LOCATION = "gps"
+    private const val DEFAULT_LANGUAGE = "english"
+    private const val DEFAULT_TEMPERATURE = "celsius"
+    private const val DEFAULT_WIND_SPEED = "ms"
+    private const val DEFAULT_NOTIFICATIONS = "enable"
+    private const val DEFAULT_CHOSEN_CITY = ""
+}
 
     private val preferences: SharedPreferences by lazy {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -68,5 +69,29 @@ class SettingsManager(private val context: Context) : ISettingsManager {
     override fun getChosenCity(): String = preferences.getString(KEY_CHOSEN_CITY, DEFAULT_CHOSEN_CITY) ?: DEFAULT_CHOSEN_CITY
     override fun setChosenCity(city: String) {
         preferences.edit { putString(KEY_CHOSEN_CITY, city) }
+    }
+
+    override fun getLatitude(): Double? {
+        return if (preferences.contains(KEY_LATITUDE)) {
+            preferences.getFloat(KEY_LATITUDE, 0f).toDouble()
+        } else {
+            null
+        }
+    }
+
+    override fun setLatitude(latitude: Double) {
+        preferences.edit { putFloat(KEY_LATITUDE, latitude.toFloat()) }
+    }
+
+    override fun getLongitude(): Double? {
+        return if (preferences.contains(KEY_LONGITUDE)) {
+            preferences.getFloat(KEY_LONGITUDE, 0f).toDouble()
+        } else {
+            null
+        }
+    }
+
+    override fun setLongitude(longitude: Double) {
+        preferences.edit { putFloat(KEY_LONGITUDE, longitude.toFloat()) }
     }
 }

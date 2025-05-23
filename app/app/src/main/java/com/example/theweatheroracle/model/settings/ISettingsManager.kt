@@ -24,4 +24,11 @@ interface ISettingsManager {
 
     fun getChosenCity(): String
     fun setChosenCity(city: String)
+
+    fun getLatitude(): Double?
+    fun setLatitude(latitude: Double)
+
+    fun getLongitude(): Double?
+    fun setLongitude(longitude: Double)
+
 }
