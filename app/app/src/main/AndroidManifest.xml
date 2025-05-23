@@ -16,12 +16,12 @@
             android:name=".settings.Settings"
             android:exported="false" />
         <activity
-            android:name=".NavActivity"
+            android:name=".nav.NavActivity"
             android:exported="true"
             android:theme="@style/Theme.TheWeatherOracle.NoActionBar">
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name=".splash.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
