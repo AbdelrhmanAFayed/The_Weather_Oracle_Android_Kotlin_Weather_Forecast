@@ -1,8 +1,12 @@
 package com.example.theweatheroracle.model
 
 import android.os.Parcelable
+import androidx.room.Embedded
 import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.PrimaryKey
 
 @Parcelize
 data class WeatherForecastResponse(
@@ -25,7 +29,20 @@ data class Forecast(
     val rain: Rain?,
     val sys: Sys,
     val dt_txt: String
-) : Parcelable
+) : Parcelable {
+    constructor(entity: ForecastEntity, weatherEntries: List<WeatherEntryEntity>) : this(
+        dt = entity.dt,
+        main = entity.main,
+        weather = weatherEntries.map { Weather(it) },
+        clouds = entity.clouds,
+        wind = entity.wind,
+        visibility = entity.visibility,
+        pop = entity.pop,
+        rain = entity.rain,
+        sys = entity.sys,
+        dt_txt = entity.dt_txt
+    )
+}
 
 @Parcelize
 data class WeatherResponse(
@@ -64,7 +81,14 @@ data class Weather(
     @SerializedName("main") val main: String,
     @SerializedName("description") val description: String,
     @SerializedName("icon") val icon: String
-) : Parcelable
+) : Parcelable {
+    constructor(entity: WeatherEntryEntity) : this(
+        id = entity.id,
+        main = entity.main,
+        description = entity.description,
+        icon = entity.icon
+    )
+}
 
 @Parcelize
 data class Clouds(
@@ -90,19 +114,21 @@ data class CurrentRain(
 
 @Parcelize
 data class Sys(
-    @SerializedName("pod") val pod: String? = null, // For /forecast
-    @SerializedName("type") val type: Int? = null, // For /weather
-    @SerializedName("id") val id: Int? = null, // For /weather
-    @SerializedName("country") val country: String? = null, // For /weather
-    @SerializedName("sunrise") val sunrise: Long? = null, // For /weather
-    @SerializedName("sunset") val sunset: Long? = null // For /weather
+    @SerializedName("pod") val pod: String? = null,
+    @SerializedName("type") val type: Int? = null,
+    @SerializedName("id") val id: Int? = null,
+    @SerializedName("country") val country: String? = null,
+    @SerializedName("sunrise") val sunrise: Long? = null,
+    @SerializedName("sunset") val sunset: Long? = null
 ) : Parcelable
 
 @Parcelize
+@Entity(tableName = "cities")
 data class City(
+    @PrimaryKey
     @SerializedName("id") val id: Int,
     @SerializedName("name") val name: String,
-    @SerializedName("coord") val coord: Coord,
+    @Embedded @SerializedName("coord") val coord: Coord,
     @SerializedName("country") val country: String,
     @SerializedName("population") val population: Int,
     @SerializedName("timezone") val timezone: Int,
@@ -115,3 +141,75 @@ data class Coord(
     @SerializedName("lat") val lat: Double,
     @SerializedName("lon") val lon: Double
 ) : Parcelable
+
+@Parcelize
+@Entity(
+    tableName = "forecasts",
+    foreignKeys = [
+        ForeignKey(
+            entity = City::class,
+            parentColumns = ["id"],
+            childColumns = ["cityId"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ]
+)
+data class ForecastEntity(
+    @PrimaryKey(autoGenerate = true)
+    val forecastId: Long = 0,
+    val cityId: Int,
+    val dt: Long,
+    @Embedded val main: Main,
+    @Embedded val clouds: Clouds,
+    @Embedded val wind: Wind,
+    val visibility: Int,
+    val pop: Double,
+    @Embedded val rain: Rain?,
+    @Embedded val sys: Sys,
+    val dt_txt: String
+) : Parcelable {
+    constructor(forecast: Forecast, cityId: Int) : this(
+        forecastId = 0,
+        cityId = cityId,
+        dt = forecast.dt,
+        main = forecast.main,
+        clouds = forecast.clouds,
+        wind = forecast.wind,
+        visibility = forecast.visibility,
+        pop = forecast.pop,
+        rain = forecast.rain,
+        sys = forecast.sys,
+        dt_txt = forecast.dt_txt
+    )
+}
+
+@Parcelize
+@Entity(
+    tableName = "weather_entries",
+    foreignKeys = [
+        ForeignKey(
+            entity = ForecastEntity::class,
+            parentColumns = ["forecastId"],
+            childColumns = ["forecastId"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ]
+)
+data class WeatherEntryEntity(
+    @PrimaryKey(autoGenerate = true)
+    val weatherEntryId: Long = 0,
+    val forecastId: Long,
+    val id: Int,
+    val main: String,
+    val description: String,
+    val icon: String
+) : Parcelable {
+    constructor(weather: Weather, forecastId: Long) : this(
+        weatherEntryId = 0,
+        forecastId = forecastId,
+        id = weather.id,
+        main = weather.main,
+        description = weather.description,
+        icon = weather.icon
+    )
+}

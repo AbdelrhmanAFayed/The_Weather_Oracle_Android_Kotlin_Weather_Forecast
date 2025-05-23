@@ -32,4 +32,15 @@ interface WeatherRepository {
         mode: String? = "json",
         lang: String? = null
     ): Result<WeatherResponse>
+
+    suspend fun getCityById(cityId: Int): City?
+    suspend fun getAllCities(): List<City>
+    suspend fun deleteCityById(cityId: Int)
+    suspend fun deleteAllCities()
+
+    suspend fun getForecastsForCity(cityId: Int): List<Forecast>
+    suspend fun getForecastsForCityAndDt(cityId: Int, dt: Long): List<Forecast>
+    suspend fun getForecastsForCityAfterDt(cityId: Int, dt: Long): List<Forecast>
+    suspend fun deleteForecastsForCity(cityId: Int)
+    suspend fun deleteAllForecasts()
 }
