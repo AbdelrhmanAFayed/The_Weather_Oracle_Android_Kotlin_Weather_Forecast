@@ -4,35 +4,35 @@ import com.example.theweatheroracle.model.WeatherForecastResponse
 import com.example.theweatheroracle.model.WeatherResponse
 
 interface WeatherRemoteDataSource {
-    suspend fun getWeatherForecast(
+    suspend fun fetchWeatherByLatLon(
+        latitude: Double,
+        longitude: Double,
+        units: String? = "standard",
+        mode: String? = "json",
+        lang: String? = null
+    ): Result<WeatherResponse>
+
+    suspend fun fetchWeatherByCityId(
+        cityId: Int,
+        units: String? = "standard",
+        mode: String? = "json",
+        lang: String? = null
+    ): Result<WeatherResponse>
+
+    suspend fun fetchWeatherForecast(
         latitude: Double,
         longitude: Double,
         units: String? = "standard",
         mode: String? = "json",
         cnt: Int? = null,
         lang: String? = null
-    ): WeatherForecastResponse
+    ): Result<WeatherForecastResponse>
 
-    suspend fun getForecastByCityId(
+    suspend fun fetchForecastByCityId(
         cityId: Int,
         units: String? = "standard",
         mode: String? = "json",
         cnt: Int? = null,
         lang: String? = null
-    ): WeatherForecastResponse
-
-    suspend fun getWeatherByLatLon(
-        latitude: Double,
-        longitude: Double,
-        units: String? = "standard",
-        mode: String? = "json",
-        lang: String? = null
-    ): WeatherResponse
-
-    suspend fun getWeatherByCityId(
-        cityId: Int,
-        units: String? = "standard",
-        mode: String? = "json",
-        lang: String? = null
-    ): WeatherResponse
+    ): Result<WeatherForecastResponse>
 }

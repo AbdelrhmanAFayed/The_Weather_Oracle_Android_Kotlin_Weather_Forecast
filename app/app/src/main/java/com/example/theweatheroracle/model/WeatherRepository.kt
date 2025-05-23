@@ -8,7 +8,7 @@ interface WeatherRepository {
         mode: String? = "json",
         cnt: Int? = null,
         lang: String? = null
-    ): WeatherForecastResponse?
+    ): Result<WeatherForecastResponse>
 
     suspend fun fetchForecastByCityId(
         cityId: Int,
@@ -16,7 +16,7 @@ interface WeatherRepository {
         mode: String? = "json",
         cnt: Int? = null,
         lang: String? = null
-    ): WeatherForecastResponse?
+    ): Result<WeatherForecastResponse>
 
     suspend fun fetchWeatherByLatLon(
         latitude: Double,
@@ -24,12 +24,12 @@ interface WeatherRepository {
         units: String? = "standard",
         mode: String? = "json",
         lang: String? = null
-    ): WeatherResponse?
+    ): Result<WeatherResponse>
 
     suspend fun fetchWeatherByCityId(
         cityId: Int,
         units: String? = "standard",
         mode: String? = "json",
         lang: String? = null
-    ): WeatherResponse?
+    ): Result<WeatherResponse>
 }
