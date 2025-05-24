@@ -139,7 +139,9 @@ class MainActivity : AppCompatActivity() {
             settingsManager.setLongitude(lon)
             proceedToNavActivity()
         }
+        mapDialog.setCancelable(false)
         mapDialog.show(supportFragmentManager, "MapSelectionDialog")
+
     }
 
     private fun areLocationPermissionsGranted(): Boolean {
