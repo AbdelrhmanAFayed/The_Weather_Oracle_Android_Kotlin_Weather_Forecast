@@ -6,6 +6,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -13,6 +14,12 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.theweatheroracle.R
 import com.example.theweatheroracle.databinding.ActivityNavBinding
+import com.example.theweatheroracle.map.MapSelectionDialogFragment
+import com.example.theweatheroracle.map.MapViewModel
+import com.example.theweatheroracle.map.MapViewModelFactory
+import com.example.theweatheroracle.model.WeatherRepositoryImp
+import com.example.theweatheroracle.model.api.WeatherRemoteDataSourceImpl
+import com.example.theweatheroracle.model.db.WeatherLocalDataSourceImpl
 import com.example.theweatheroracle.settings.Settings
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
@@ -21,6 +28,7 @@ class NavActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityNavBinding
+    private lateinit var viewModel: MapViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,12 +38,18 @@ class NavActivity : AppCompatActivity() {
 
         setSupportActionBar(binding.appBarNav.toolbar)
 
-        binding.appBarNav.fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null)
-                .setAnchorView(R.id.fab).show()
-        }
+        viewModel = ViewModelProvider(this, MapViewModelFactory(WeatherRepositoryImp.getInstance(
+            WeatherRemoteDataSourceImpl,
+            WeatherLocalDataSourceImpl.getInstance(this)
+        )))[MapViewModel::class.java]
 
+        binding.appBarNav.fab.setOnClickListener { view ->
+            val mapDialog = MapSelectionDialogFragment.newInstance { lat, lon ->
+                viewModel.addCityFromMap(lat, lon)
+                Snackbar.make(view, "City added at $lat, $lon", Snackbar.LENGTH_SHORT).show()
+            }
+            mapDialog.show(supportFragmentManager, "MapSelectionDialog")
+        }
 
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
@@ -51,7 +65,6 @@ class NavActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.nav, menu)
         return true
     }

@@ -29,6 +29,6 @@
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="@dimen/fab_margin"
         android:layout_marginBottom="16dp"
-        app:srcCompat="@android:drawable/ic_dialog_email" />
+        app:srcCompat="@drawable/sharp_add_black_36" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

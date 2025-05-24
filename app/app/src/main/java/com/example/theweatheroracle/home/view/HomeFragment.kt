@@ -13,7 +13,6 @@ import com.bumptech.glide.Glide
 import com.example.theweatheroracle.databinding.FragmentHomeBinding
 import com.example.theweatheroracle.home.viewmodel.HomeViewModel
 import com.example.theweatheroracle.home.viewmodel.HomeViewModelFactory
-import com.example.theweatheroracle.model.WeatherRepository
 import com.example.theweatheroracle.model.WeatherRepositoryImp
 import com.example.theweatheroracle.model.api.WeatherRemoteDataSourceImpl
 import com.example.theweatheroracle.model.db.WeatherLocalDataSourceImpl
@@ -30,18 +29,15 @@ class HomeFragment : Fragment() {
     private lateinit var homeViewModel: HomeViewModel
     private lateinit var dailyForecastAdapter: DailyForecastAdapter
     private lateinit var weeklyForecastAdapter: WeeklyForecastAdapter
-    private lateinit var settingsManager : ISettingsManager
+    private lateinit var settingsManager: ISettingsManager
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
-    private  var cityId: Int? = null
+    private var cityId: Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         settingsManager = SettingsManager(requireContext())
-        latitude = settingsManager.getLatitude() ?: 0.0
-        longitude = settingsManager.getLongitude() ?: 0.0
-        cityId = settingsManager.getChosenCity().toIntOrNull()
-
+        updateLocationData()
 
         val factory = HomeViewModelFactory(WeatherRepositoryImp.getInstance(
             WeatherRemoteDataSourceImpl,
@@ -69,19 +65,7 @@ class HomeFragment : Fragment() {
 
         val connectivityManager = requireContext().getSystemService(android.content.Context.CONNECTIVITY_SERVICE) as android.net.ConnectivityManager
         val isInitiallyOnline = connectivityManager.activeNetwork != null
-        if (isInitiallyOnline) {
-            homeViewModel.fetchWeatherData(latitude, longitude)
-        } else {
-            cityId?.let { id ->
-                if (id != 0) {
-                    homeViewModel.fetchWeatherByCityIdFromDb(id)
-                } else {
-                    Log.w("HomeFragment", "Invalid cityId (0) for database fetch")
-                }
-            } ?: run {
-                Log.w("HomeFragment", "No cityId available for database fetch")
-            }
-        }
+        refreshData(isInitiallyOnline)
 
         viewLifecycleOwner.lifecycleScope.launch {
             networkObserver.observe().collectLatest { status ->
@@ -112,10 +96,13 @@ class HomeFragment : Fragment() {
         }
 
         homeViewModel.city.observe(viewLifecycleOwner) { city ->
-            Log.d("HomeFragment", "City: $city")
+            Log.d("HomeFragment", "City observed: $city")
             binding.cityNameText.text = city?.name ?: "Unknown"
-            cityId = city?.id
-            settingsManager.setChosenCity(cityId?.toString() ?: "")
+            // Only update cityId and SettingsManager if the city is not null
+            if (city != null) {
+                cityId = city.id
+                settingsManager.setChosenCity(city.id.toString())
+            }
         }
 
         homeViewModel.weather.observe(viewLifecycleOwner) { weather ->
@@ -143,6 +130,7 @@ class HomeFragment : Fragment() {
             dailyForecastAdapter.submitList(forecasts)
             dailyForecastAdapter.setTemperatureUnit(settingsManager.getTemperatureUnit())
         }
+
         homeViewModel.weeklySummaries.observe(viewLifecycleOwner) { summaries ->
             weeklyForecastAdapter.submitList(summaries)
             weeklyForecastAdapter.setTemperatureUnit(settingsManager.getTemperatureUnit())
@@ -155,9 +143,23 @@ class HomeFragment : Fragment() {
         binding.weeklyForecastList.adapter = weeklyForecastAdapter
     }
 
-
     override fun onResume() {
         super.onResume()
+        updateLocationData()
+        refreshData(isOnline())
+    }
+
+    private fun updateLocationData() {
+        latitude = settingsManager.getLatitude() ?: 0.0
+        longitude = settingsManager.getLongitude() ?: 0.0
+        cityId = settingsManager.getChosenCity().toIntOrNull()
+        Log.d("HomeFragment", "Updated location data: cityId=$cityId, lat=$latitude, lon=$longitude")
+    }
+
+    private fun refreshData(isOnline: Boolean) {
+        if (isOnline) {
+            homeViewModel.fetchWeatherData(latitude, longitude)
+        } else {
             cityId?.let { id ->
                 if (id != 0) {
                     homeViewModel.fetchWeatherByCityIdFromDb(id)
@@ -167,7 +169,12 @@ class HomeFragment : Fragment() {
             } ?: run {
                 Log.w("HomeFragment", "No cityId available for database fetch")
             }
+        }
+    }
 
+    private fun isOnline(): Boolean {
+        val connectivityManager = requireContext().getSystemService(android.content.Context.CONNECTIVITY_SERVICE) as android.net.ConnectivityManager
+        return connectivityManager.activeNetwork != null
     }
 
     private fun convertTemperature(kelvin: Double, unit: String): Pair<Double, String> {
