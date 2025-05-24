@@ -18,4 +18,5 @@ interface WeatherLocalDataSource {
     suspend fun getWeatherForForecast(forecast: Forecast): List<Weather>
     suspend fun deleteForecastsForCity(cityId: Int)
     suspend fun deleteAllForecasts()
+    suspend fun deleteForecastsBeforeDt(id: Int, dt : Long)
 }

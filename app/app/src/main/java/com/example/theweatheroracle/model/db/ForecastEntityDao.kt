@@ -23,6 +23,9 @@ interface ForecastEntityDao {
     @Query("SELECT * FROM forecasts WHERE cityId = :cityId AND dt > :dt")
     suspend fun getForecastsForCityAfterDt(cityId: Int, dt: Long): List<ForecastEntity>
 
+    @Query("DELETE FROM forecasts WHERE cityId = :cityId AND dt < :dt")
+    suspend fun deleteForecastsBeforeDt(cityId: Int, dt: Long)
+
     @Query("DELETE FROM forecasts WHERE cityId = :cityId")
     suspend fun deleteForecastsForCity(cityId: Int)
 

@@ -94,11 +94,13 @@ class WeatherLocalDataSourceImpl private constructor(
 
     override suspend fun deleteForecastsForCity(cityId: Int) {
         forecastEntityDao.deleteForecastsForCity(cityId)
-        // No need to delete weather entries explicitly due to CASCADE
     }
 
     override suspend fun deleteAllForecasts() {
         forecastEntityDao.deleteAllForecasts()
-        // No need to delete weather entries explicitly due to CASCADE
+    }
+
+    override suspend fun deleteForecastsBeforeDt(id: Int, dt: Long) {
+        forecastEntityDao.deleteForecastsBeforeDt(id,dt)
     }
 }

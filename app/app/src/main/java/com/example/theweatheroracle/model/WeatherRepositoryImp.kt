@@ -168,4 +168,8 @@ class WeatherRepositoryImp private constructor(
             localDataSource.deleteAllForecasts()
         }
     }
+
+    override suspend fun deleteForecastsForCityBeforeDt(cityId: Int, dt: Long) {
+        localDataSource.deleteForecastsBeforeDt(cityId, dt)
+    }
 }

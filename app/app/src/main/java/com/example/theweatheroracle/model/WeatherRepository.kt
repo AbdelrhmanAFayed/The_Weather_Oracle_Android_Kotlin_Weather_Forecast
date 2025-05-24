@@ -43,4 +43,7 @@ interface WeatherRepository {
     suspend fun getForecastsForCityAfterDt(cityId: Int, dt: Long): List<Forecast>
     suspend fun deleteForecastsForCity(cityId: Int)
     suspend fun deleteAllForecasts()
+
+    suspend fun deleteForecastsForCityBeforeDt(cityId: Int, dt: Long)
+
 }
