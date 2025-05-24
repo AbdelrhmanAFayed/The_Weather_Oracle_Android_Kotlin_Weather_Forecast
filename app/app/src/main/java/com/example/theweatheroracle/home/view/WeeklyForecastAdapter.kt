@@ -27,6 +27,20 @@ class WeeklyForecastAdapter : ListAdapter<DailySummary, WeeklyForecastAdapter.Vi
             oldItem == newItem
     }
 
+    private var temperatureUnit: String = "Kelvin"
+
+    fun setTemperatureUnit(unit: String) {
+        temperatureUnit = unit
+    }
+
+    private fun convertTemperature(kelvin: Double): Pair<Double, String> {
+        return when (temperatureUnit.lowercase()) {
+            "celsius" -> (kelvin - 273.15) to "°C"
+            "fahrenheit" -> ((kelvin - 273.15) * 9 / 5 + 32) to "°F"
+            else -> kelvin to "K"
+        }
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = WeeklyForecastItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding)
@@ -36,12 +50,14 @@ class WeeklyForecastAdapter : ListAdapter<DailySummary, WeeklyForecastAdapter.Vi
         val item = getItem(position)
         holder.apply {
             binding.weekDayLabel.text = item.day
-            binding.weekTempRange.text = "${item.minTemp}K - ${item.maxTemp}K"
+            val (convertedMinTemp, tempUnitLabel) = convertTemperature(item.minTemp)
+            val maxTempValue = item.maxTemp.replace("K", "").toDoubleOrNull() ?: item.minTemp
+            val (convertedMaxTemp, _) = convertTemperature(maxTempValue)
+            binding.weekTempRange.text = String.format("%.1f - %.1f %s", convertedMinTemp, convertedMaxTemp, tempUnitLabel)
             val iconUrl = "https://openweathermap.org/img/wn/${item.icon}@2x.png"
             Glide.with(binding.weekIcon.context)
                 .load(iconUrl)
                 .into(binding.weekIcon)
-
         }
     }
 }

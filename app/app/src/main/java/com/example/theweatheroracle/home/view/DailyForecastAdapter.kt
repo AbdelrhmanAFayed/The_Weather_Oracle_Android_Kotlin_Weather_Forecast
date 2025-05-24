@@ -22,6 +22,19 @@ class DailyForecastAdapter : ListAdapter<Forecast, DailyForecastAdapter.ViewHold
         sdf.timeZone = TimeZone.getDefault()
         return sdf.format(Date(timestamp * 1000))
     }
+    private var temperatureUnit: String = "Kelvin"
+
+    fun setTemperatureUnit(unit: String) {
+        temperatureUnit = unit
+    }
+
+    private fun convertTemperature(kelvin: Double): Pair<Double, String> {
+        return when (temperatureUnit.lowercase()) {
+            "celsius" -> (kelvin - 273.15) to "°C"
+            "fahrenheit" -> ((kelvin - 273.15) * 9 / 5 + 32) to "°F"
+            else -> kelvin to "K"
+        }
+    }
 
     class DiffCallback : DiffUtil.ItemCallback<Forecast>() {
         override fun areItemsTheSame(oldItem: Forecast, newItem: Forecast) =
@@ -40,7 +53,8 @@ class DailyForecastAdapter : ListAdapter<Forecast, DailyForecastAdapter.ViewHold
         val item = getItem(position)
         holder.apply {
             binding.dayTimeLabel.text = convertTime(item.dt)
-            binding.dayTempValue.text = "${item.main.temp} K"
+            val (convertedTemp, tempUnitLabel) = convertTemperature(item.main.temp)
+            binding.dayTempValue.text = String.format("%.1f %s", convertedTemp, tempUnitLabel)
             binding.dayDescText.text = item.weather[0].description
 
             val iconCode = item.weather[0].icon
@@ -48,7 +62,6 @@ class DailyForecastAdapter : ListAdapter<Forecast, DailyForecastAdapter.ViewHold
             Glide.with(binding.dayWeatherIcon.context)
                 .load(iconUrl)
                 .into(binding.dayWeatherIcon)
-
         }
     }
 }
