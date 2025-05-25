@@ -1,6 +1,7 @@
 package com.example.theweatheroracle.nav
 
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -14,6 +15,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.theweatheroracle.R
 import com.example.theweatheroracle.databinding.ActivityNavBinding
+import com.example.theweatheroracle.lan.LocaleUtils
 import com.example.theweatheroracle.map.MapSelectionDialogFragment
 import com.example.theweatheroracle.map.MapViewModel
 import com.example.theweatheroracle.map.MapViewModelFactory
@@ -82,5 +84,9 @@ class NavActivity : AppCompatActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        attachBaseContext(LocaleUtils.updateLocale(this))
     }
 }

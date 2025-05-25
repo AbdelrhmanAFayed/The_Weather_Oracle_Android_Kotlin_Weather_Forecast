@@ -5,6 +5,7 @@ import android.animation.Animator
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.location.Location
 import android.os.Bundle
 import android.widget.RadioButton
@@ -16,6 +17,7 @@ import androidx.appcompat.widget.AppCompatCheckBox
 import com.airbnb.lottie.LottieAnimationView
 import com.example.theweatheroracle.nav.NavActivity
 import com.example.theweatheroracle.R
+import com.example.theweatheroracle.lan.LocaleUtils
 import com.example.theweatheroracle.map.MapSelectionDialogFragment
 import com.example.theweatheroracle.model.settings.ISettingsManager
 import com.example.theweatheroracle.model.settings.SettingsManager
@@ -26,7 +28,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
-import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
     private lateinit var settingsManager: ISettingsManager
@@ -37,13 +38,12 @@ class MainActivity : AppCompatActivity() {
     private var isNotificationsEnabled: Boolean = false
     private lateinit var permissionLauncher: ActivityResultLauncher<Array<String>>
 
-    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        LocaleUtils.updateLocale(this)
         setContentView(R.layout.activity_main)
 
         settingsManager = SettingsManager(this)
-        setLocale() // Set locale on startup
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
@@ -93,18 +93,9 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    private fun setLocale() {
-        val language = settingsManager.getLanguage()
-        val locale = when (language) {
-            "system" -> Locale.getDefault()
-            "english" -> Locale.ENGLISH
-            "arabic" -> Locale("ar")
-            else -> Locale.ENGLISH // Fallback
-        }
-        Locale.setDefault(locale)
-        val config = resources.configuration
-        config.setLocale(locale)
-        resources.updateConfiguration(config, resources.displayMetrics)
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        LocaleUtils.updateLocale(this)
     }
 
     private fun showSetupAlert() {
@@ -121,7 +112,6 @@ class MainActivity : AppCompatActivity() {
                 isLocationMethodGPS = gpsRadioButton.isChecked
                 isNotificationsEnabled = notificationsCheckBox.isChecked
 
-                // Save preferences
                 settingsManager.setFirstTime(false)
                 settingsManager.setLocation(if (isLocationMethodGPS) "gps" else "map")
                 settingsManager.setNotifications(if (isNotificationsEnabled) "enable" else "disable")
@@ -133,9 +123,8 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             .setNegativeButton("Skip") { _, _ ->
-                // Use default location (Giza, Egypt)
-                latitude = 29.9978
-                longitude = 31.0529
+                latitude = 30.0
+                longitude = 30.0
                 settingsManager.setFirstTime(false)
                 settingsManager.setLatitude(latitude!!)
                 settingsManager.setLongitude(longitude!!)
@@ -193,9 +182,8 @@ class MainActivity : AppCompatActivity() {
                 latitude = locationResult.first
                 longitude = locationResult.second
             } else {
-                // Use default location (Giza, Egypt)
-                latitude = 29.9978
-                longitude = 31.0529
+                latitude = 30.0
+                longitude = 30.0
             }
 
             settingsManager.setLatitude(latitude!!)

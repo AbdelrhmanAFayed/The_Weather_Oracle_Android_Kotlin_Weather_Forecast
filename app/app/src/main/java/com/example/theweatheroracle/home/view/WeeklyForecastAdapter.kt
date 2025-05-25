@@ -7,17 +7,19 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.theweatheroracle.databinding.WeeklyForecastItemBinding
+import com.example.theweatheroracle.model.WeatherDescriptionMapper
 
 data class DailySummary(
     val day: String,
     val minTemp: Double,
     val maxTemp: String,
-    val icon: String
+    val icon: String,
+    val description: String
 )
 
 class WeeklyForecastAdapter : ListAdapter<DailySummary, WeeklyForecastAdapter.ViewHolder>(DiffCallback()) {
 
-    class ViewHolder( val binding: WeeklyForecastItemBinding) : RecyclerView.ViewHolder(binding.root)
+    class ViewHolder(val binding: WeeklyForecastItemBinding) : RecyclerView.ViewHolder(binding.root)
 
     class DiffCallback : DiffUtil.ItemCallback<DailySummary>() {
         override fun areItemsTheSame(oldItem: DailySummary, newItem: DailySummary) =
@@ -28,9 +30,14 @@ class WeeklyForecastAdapter : ListAdapter<DailySummary, WeeklyForecastAdapter.Vi
     }
 
     private var temperatureUnit: String = "Kelvin"
+    private var isArabicSelected: Boolean = false
 
     fun setTemperatureUnit(unit: String) {
         temperatureUnit = unit
+    }
+
+    fun setLanguage(isArabic: Boolean) {
+        isArabicSelected = isArabic
     }
 
     private fun convertTemperature(kelvin: Double): Pair<Double, String> {
@@ -54,6 +61,8 @@ class WeeklyForecastAdapter : ListAdapter<DailySummary, WeeklyForecastAdapter.Vi
             val maxTempValue = item.maxTemp.replace("K", "").toDoubleOrNull() ?: item.minTemp
             val (convertedMaxTemp, _) = convertTemperature(maxTempValue)
             binding.weekTempRange.text = String.format("%.1f - %.1f %s", convertedMinTemp, convertedMaxTemp, tempUnitLabel)
+
+
             val iconUrl = "https://openweathermap.org/img/wn/${item.icon}@2x.png"
             Glide.with(binding.weekIcon.context)
                 .load(iconUrl)

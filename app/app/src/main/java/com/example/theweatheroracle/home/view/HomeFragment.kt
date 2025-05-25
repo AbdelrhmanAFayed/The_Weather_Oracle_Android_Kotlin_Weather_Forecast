@@ -17,6 +17,7 @@ import com.bumptech.glide.Glide
 import com.example.theweatheroracle.databinding.FragmentHomeBinding
 import com.example.theweatheroracle.home.viewmodel.HomeViewModel
 import com.example.theweatheroracle.home.viewmodel.HomeViewModelFactory
+import com.example.theweatheroracle.model.WeatherDescriptionMapper
 import com.example.theweatheroracle.model.WeatherRepositoryImp
 import com.example.theweatheroracle.model.api.WeatherRemoteDataSourceImpl
 import com.example.theweatheroracle.model.db.WeatherLocalDataSourceImpl
@@ -28,6 +29,7 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
@@ -99,6 +101,15 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupObservers() {
+        // Check if Arabic is selected (manually or via system)
+        val isArabicSelected = settingsManager.getLanguage().let { language ->
+            language == "arabic" || (language == "system" && Locale.getDefault().language == "ar")
+        }
+
+        // Set language for adapters
+        dailyForecastAdapter.setLanguage(isArabicSelected)
+        weeklyForecastAdapter.setLanguage(isArabicSelected)
+
         viewLifecycleOwner.lifecycleScope.launch {
             networkObserver.observe().collectLatest { status ->
                 Log.d("NetworkTest", "Network Status: $status")
@@ -138,8 +149,14 @@ class HomeFragment : Fragment() {
                 val (convertedTemp, tempUnitLabel) = convertTemperature(weather.main.temp, tempUnit)
                 val (convertedWindSpeed, windUnitLabel) = convertWindSpeed(weather.wind.speed, windUnit)
 
-                binding.weatherDescText.text = weather.weather[0].description
-                Glide.with(this)
+                // Translate the weather description
+                val description = WeatherDescriptionMapper.getTranslatedDescription(
+                    weather.weather[0].description,
+                    isArabicSelected
+                )
+                binding.weatherDescText.text = description
+
+                Glide.with(this@HomeFragment)
                     .load("https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png")
                     .into(binding.weatherIcon)
                 binding.currentTempText.text = String.format("%.1f %s", convertedTemp, tempUnitLabel)
@@ -204,6 +221,8 @@ class HomeFragment : Fragment() {
                 Log.w("HomeFragment", "No cityId available for refresh")
             }
         }
+        dailyForecastAdapter.setTemperatureUnit(settingsManager.getTemperatureUnit())
+        weeklyForecastAdapter.setTemperatureUnit(settingsManager.getTemperatureUnit())
 
         cityId?.let { id ->
             if (id != 0) {
@@ -284,6 +303,7 @@ class HomeFragment : Fragment() {
             else -> ms to "m/s"
         }
     }
+
     private fun preloadWeatherIcons() {
         val baseUrl = "https://openweathermap.org/img/wn/"
         val validIconCodes = listOf("01", "02", "03", "04", "09", "10", "11", "13", "50")

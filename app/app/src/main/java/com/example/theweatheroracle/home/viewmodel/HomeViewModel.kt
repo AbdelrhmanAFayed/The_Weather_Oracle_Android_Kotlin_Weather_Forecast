@@ -7,12 +7,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.theweatheroracle.home.view.DailySummary
 import com.example.theweatheroracle.model.City
+import com.example.theweatheroracle.model.CurrentRain
 import com.example.theweatheroracle.model.Forecast
 import com.example.theweatheroracle.model.WeatherForecastResponse
-import com.example.theweatheroracle.model.WeatherRepository
 import com.example.theweatheroracle.model.WeatherResponse
+import com.example.theweatheroracle.model.WeatherRepository
 import com.example.theweatheroracle.model.settings.ISettingsManager
-import com.example.theweatheroracle.model.*
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -94,7 +94,6 @@ class HomeViewModel(
                         )
                     }
                 } else {
-                    // Fallback to forecast data if API fails
                     val city = _city.value
                     if (city != null) {
                         val currentDt = System.currentTimeMillis() / 1000
@@ -106,7 +105,6 @@ class HomeViewModel(
                     }
                 }
             } else {
-                // Offline: Use forecast data
                 val city = _city.value
                 if (city != null) {
                     val currentDt = System.currentTimeMillis() / 1000
@@ -151,7 +149,6 @@ class HomeViewModel(
                     )
                 }
             } else {
-                // Fallback to forecast data if API fails
                 val city = _city.value
                 if (city != null) {
                     val currentDt = System.currentTimeMillis() / 1000
@@ -174,7 +171,6 @@ class HomeViewModel(
                 _dailyForecasts.postValue(forecasts)
                 _weeklySummaries.postValue(computeWeeklySummaries(forecasts))
 
-                // Offline: Use forecast data
                 val currentDt = System.currentTimeMillis() / 1000
                 val futureForecasts = repository.getForecastsForCityAfterDt(cityId, currentDt)
                 val latestForecast = futureForecasts.minByOrNull { it.dt }
@@ -209,7 +205,8 @@ class HomeViewModel(
             val minTemp = forecastsForDay.minOf { it.main.tempMin }
             val maxTemp = forecastsForDay.maxOf { it.main.tempMax }.toString() + "K"
             val icon = forecastsForDay.first().weather.firstOrNull()?.icon ?: "01d"
-            DailySummary(day, minTemp, maxTemp, icon)
+            val description = forecastsForDay.first().weather.firstOrNull()?.description ?: "clear sky"
+            DailySummary(day, minTemp, maxTemp, icon, description)
         }
     }
 }
@@ -223,7 +220,7 @@ fun Forecast.toWeatherResponse(city: City): WeatherResponse {
         clouds = this.clouds,
         rain = CurrentRain(oneHour = this.rain?.threeHours ?: 0.0),
         dt = this.dt,
-        sys = this.sys ,
+        sys = this.sys,
         timezone = city.timezone,
         id = city.id,
         name = city.name,

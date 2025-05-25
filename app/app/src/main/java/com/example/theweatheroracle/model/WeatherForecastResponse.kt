@@ -213,3 +213,72 @@ data class WeatherEntryEntity(
         icon = weather.icon
     )
 }
+
+object WeatherDescriptionMapper {
+    private val weatherTranslations = mapOf(
+        "clear sky" to "سماء صافية",
+        "few clouds" to "غيوم قليلة",
+        "scattered clouds" to "غيوم متفرقة",
+        "broken clouds" to "غيوم متكسرة",
+        "overcast clouds" to "غيوم ملبدة",
+        "shower rain" to "أمطار متفرقة",
+        "rain" to "مطر",
+        "thunderstorm" to "عاصفة رعدية",
+        "snow" to "ثلج",
+        "mist" to "ضباب خفيف",
+        "thunderstorm with light rain" to "عاصفة رعدية مع مطر خفيف",
+        "thunderstorm with rain" to "عاصفة رعدية مع مطر",
+        "thunderstorm with heavy rain" to "عاصفة رعدية مع مطر غزير",
+        "light thunderstorm" to "عاصفة رعدية خفيفة",
+        "heavy thunderstorm" to "عاصفة رعدية شديدة",
+        "ragged thunderstorm" to "عاصفة رعدية غير منتظمة",
+        "thunderstorm with light drizzle" to "عاصفة رعدية مع رذاذ خفيف",
+        "thunderstorm with drizzle" to "عاصفة رعدية مع رذاذ",
+        "thunderstorm with heavy drizzle" to "عاصفة رعدية مع رذاذ غزير",
+        "light intensity drizzle" to "رذاذ خفيف",
+        "drizzle" to "رذاذ",
+        "heavy intensity drizzle" to "رذاذ غزير",
+        "light intensity drizzle rain" to "مطر رذاذي خفيف",
+        "drizzle rain" to "مطر رذاذي",
+        "heavy intensity drizzle rain" to "مطر رذاذي غزير",
+        "shower rain and drizzle" to "أمطار متفرقة ورذاذ",
+        "heavy shower rain and drizzle" to "أمطار متفرقة ورذاذ غزير",
+        "shower drizzle" to "رذاذ متفرق",
+        "light rain" to "مطر خفيف",
+        "moderate rain" to "مطر معتدل",
+        "heavy intensity rain" to "مطر غزير",
+        "very heavy rain" to "مطر شديد جدًا",
+        "extreme rain" to "مطر شديد للغاية",
+        "freezing rain" to "مطر متجمد",
+        "light intensity shower rain" to "أمطار متفرقة خفيفة",
+        "heavy intensity shower rain" to "أمطار متفرقة غزيرة",
+        "ragged shower rain" to "أمطار متفرقة غير منتظمة",
+        "light snow" to "ثلج خفيف",
+        "heavy snow" to "ثلج غزير",
+        "sleet" to "مطر ثلجي",
+        "light shower sleet" to "مطر ثلجي متفرق خفيف",
+        "shower sleet" to "مطر ثلجي متفرق",
+        "light rain and snow" to "مطر وثلج خفيف",
+        "rain and snow" to "مطر وثلج",
+        "light shower snow" to "ثلج متفرق خفيف",
+        "shower snow" to "ثلج متفرق",
+        "heavy shower snow" to "ثلج متفرق غزير",
+        "smoke" to "دخان",
+        "haze" to "ضباب دخاني",
+        "sand/dust whirls" to "دوامات رملية/غبارية",
+        "fog" to "ضباب",
+        "sand" to "رمل",
+        "dust" to "غبار",
+        "volcanic ash" to "رماد بركاني",
+        "squalls" to "عواصف مفاجئة",
+        "tornado" to "إعصار"
+    )
+
+    fun getTranslatedDescription(description: String, isArabicSelected: Boolean): String {
+        return if (isArabicSelected) {
+            weatherTranslations[description.lowercase()] ?: description
+        } else {
+            description
+        }
+    }
+}
