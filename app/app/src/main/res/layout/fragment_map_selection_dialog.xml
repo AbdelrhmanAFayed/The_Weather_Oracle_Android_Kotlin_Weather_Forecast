@@ -16,6 +16,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="16dp"
-        android:text="Confirm Location" />
+        android:text="@string/confirm_location" />
 
 </LinearLayout>

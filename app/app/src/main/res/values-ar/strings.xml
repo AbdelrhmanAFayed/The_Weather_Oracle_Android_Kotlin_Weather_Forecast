@@ -1,0 +1,46 @@
+<resources>
+    <string name="app_name">عراف الطقس</string>
+    <string name="title_activity_nav">نشاط التنقل</string>
+    <string name="navigation_drawer_open">فتح قائمة التنقل</string>
+    <string name="navigation_drawer_close">إغلاق قائمة التنقل</string>
+    <string name="nav_header_title">استوديو أندرويد</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">رأس التنقل</string>
+    <string name="action_settings">الإعدادات</string>
+
+    <string name="menu_home">الرئيسية</string>
+    <string name="menu_gallery">معرض الصور</string>
+    <string name="menu_slideshow">عرض الشرائح</string>
+    <string name="hello_blank_fragment">مرحبًا بك في الفراغ</string>
+    <string name="location">الموقع</string>
+    <string name="language">اللغة</string>
+    <string name="temperature">درجة الحرارة</string>
+    <string name="wind_speed">سرعة الرياح</string>
+    <string name="notifications">الإشعارات</string>
+    <string name="arabic">العربية</string>
+    <string name="english">الإنجليزية</string>
+    <string name="follow_system">اتبع إعدادات النظام</string>
+    <string name="gps">GPS</string>
+    <string name="map">الخريطة</string>
+    <string name="disable">تعطيل</string>
+    <string name="enable">تفعيل</string>
+    <string name="celsius">سيليزيوس</string>
+    <string name="fahrenheit">فهرنهايت</string>
+    <string name="kelvin">كلفن</string>
+    <string name="mile_hour">ميل/ساعة</string>
+    <string name="meter_sec">متر/ثانية</string>
+    <string name="weather_icon">أيقونة الطقس</string>
+    <string name="use_gps">استخدام GPS</string>
+    <string name="select_on_map">اختر على الخريطة</string>
+    <string name="city">المدينة</string>
+    <string name="clouds">الغيوم</string>
+    <string name="humidity">الرطوبة</string>
+    <string name="pressure">الضغط</string>
+    <string name="rain">الأمطار</string>
+    <string name="_5_day_forecast">توقعات 5 أيام</string>
+    <string name="wind">الرياح</string>
+    <string name="confirm_location">تأكيد الموقع</string>
+    <string name="alerts">التنبيهات</string>
+    <string name="favourites">المفضلة</string>
+    <string name="settings">الإعدادات</string>
+</resources>

@@ -16,7 +16,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:srcCompat="@mipmap/weatherlogo"
-        android:contentDescription="Weather icon" />
+        android:contentDescription="@string/weather_icon" />
 
     <TextView
         android:id="@+id/dayTimeLabel"

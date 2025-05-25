@@ -27,10 +27,10 @@
         android:id="@+id/weekIcon"
         android:layout_width="40dp"
         android:layout_height="40dp"
+        android:contentDescription="@string/weather_icon"
         app:layout_constraintEnd_toStartOf="@+id/weekTempRange"
         app:layout_constraintTop_toTopOf="parent"
-        tools:srcCompat="@mipmap/weatherlogo"
-        android:contentDescription="Weather icon" />
+        tools:srcCompat="@mipmap/weatherlogo" />
 
     <TextView
         android:id="@+id/weekTempRange"

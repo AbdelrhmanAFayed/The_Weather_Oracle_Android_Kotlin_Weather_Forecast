@@ -21,7 +21,7 @@
                 style="@style/SettingsHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Location" />
+                android:text="@string/location" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -42,14 +42,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:checked="true"
-                        android:text="GPS" />
+                        android:text="@string/gps" />
 
                     <RadioButton
                         android:id="@+id/location_map_radio"
                         style="@style/SettingsRadioButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Map" />
+                        android:text="@string/map" />
                 </RadioGroup>
             </LinearLayout>
 
@@ -57,7 +57,7 @@
                 style="@style/SettingsHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Language" />
+                android:text="@string/language" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -76,19 +76,19 @@
                         android:id="@+id/language_system_radio"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Follow System" />
+                        android:text="@string/follow_system" />
 
                     <RadioButton
                         android:id="@+id/language_english_radio"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="English" />
+                        android:text="@string/english" />
 
                     <RadioButton
                         android:id="@+id/language_arabic_radio"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Arabic" />
+                        android:text="@string/arabic" />
                 </RadioGroup>
             </LinearLayout>
 
@@ -97,7 +97,7 @@
                 style="@style/SettingsHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Temperature" />
+                android:text="@string/temperature" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -118,21 +118,21 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:checked="true"
-                        android:text="Celsius" />
+                        android:text="@string/celsius" />
 
                     <RadioButton
                         android:id="@+id/temperature_kelvin_radio"
                         style="@style/SettingsRadioButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Kelvin" />
+                        android:text="@string/kelvin" />
 
                     <RadioButton
                         android:id="@+id/temperature_fahrenheit_radio"
                         style="@style/SettingsRadioButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Fahrenheit" />
+                        android:text="@string/fahrenheit" />
                 </RadioGroup>
             </LinearLayout>
 
@@ -141,7 +141,7 @@
                 style="@style/SettingsHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Wind Speed" />
+                android:text="@string/wind_speed" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -162,14 +162,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:checked="true"
-                        android:text="Meter / Sec" />
+                        android:text="@string/meter_sec" />
 
                     <RadioButton
                         android:id="@+id/wind_speed_mph_radio"
                         style="@style/SettingsRadioButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Mile / Hour" />
+                        android:text="@string/mile_hour" />
                 </RadioGroup>
             </LinearLayout>
 
@@ -178,7 +178,7 @@
                 style="@style/SettingsHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Notifications" />
+                android:text="@string/notifications" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -199,14 +199,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:checked="true"
-                        android:text="Enable" />
+                        android:text="@string/enable" />
 
                     <RadioButton
                         android:id="@+id/notifications_disable_radio"
                         style="@style/SettingsRadioButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Disable" />
+                        android:text="@string/disable" />
                 </RadioGroup>
             </LinearLayout>
 
