@@ -222,7 +222,8 @@ class HomeViewModel(
     private fun computeWeeklySummaries(forecasts: List<Forecast>): List<DailySummary> {
         val dailyGroups = forecasts.groupBy { forecast ->
             val date = Date(forecast.dt * 1000L)
-            SimpleDateFormat("EEEE", Locale.getDefault()).apply {
+            val locale = if (settingsManager.getLanguage() == "arabic") Locale("ar") else Locale.getDefault()
+            SimpleDateFormat("EEEE", locale).apply {
                 timeZone = TimeZone.getDefault()
             }.format(date)
         }

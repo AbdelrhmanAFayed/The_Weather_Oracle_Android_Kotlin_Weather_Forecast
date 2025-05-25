@@ -99,18 +99,10 @@ class HomeFragment : Fragment() {
         super.onResume()
         updateLocationData()
         refreshData()
+        updateLanguageSettings()
     }
 
     private fun setupObservers() {
-        // Check if Arabic is selected (manually or via system)
-        val isArabicSelected = settingsManager.getLanguage().let { language ->
-            language == "arabic" || (language == "system" && Locale.getDefault().language == "ar")
-        }
-
-        // Set language for adapters
-        dailyForecastAdapter.setLanguage(isArabicSelected)
-        weeklyForecastAdapter.setLanguage(isArabicSelected)
-
         viewLifecycleOwner.lifecycleScope.launch {
             networkObserver.observe().collectLatest { status ->
                 Log.d("NetworkTest", "Network Status: $status")
@@ -123,14 +115,22 @@ class HomeFragment : Fragment() {
                         }
                     }
                     INetworkObserver.Status.Unavailable, INetworkObserver.Status.Lost -> {
-                        cityId?.let { id ->
-                            if (id != 0) {
-                                homeViewModel.refreshData(latitude, longitude, cityId, isUsingGps, false)
-                            } else {
-                                Log.w("HomeFragment", "Invalid cityId (0) for database fetch")
+                        val hasWeatherData = homeViewModel.weather.value != null
+                        val hasDailyData = homeViewModel.dailyForecasts.value?.isNotEmpty() == true
+                        val hasWeeklyData = homeViewModel.weeklySummaries.value?.isNotEmpty() == true
+
+                        if (hasWeatherData || hasDailyData || hasWeeklyData) {
+                            Log.d("HomeFragment", "Keeping existing data as offline with data present")
+                        } else {
+                            cityId?.let { id ->
+                                if (id != 0) {
+                                    homeViewModel.refreshData(latitude, longitude, cityId, isUsingGps, false)
+                                } else {
+                                    Log.w("HomeFragment", "Invalid cityId (0) for database fetch")
+                                }
+                            } ?: run {
+                                Log.w("HomeFragment", "No cityId available for database fetch")
                             }
-                        } ?: run {
-                            Log.w("HomeFragment", "No cityId available for database fetch")
                         }
                     }
                 }
@@ -146,11 +146,13 @@ class HomeFragment : Fragment() {
             if (weather != null) {
                 val tempUnit = settingsManager.getTemperatureUnit()
                 val windUnit = settingsManager.getWindSpeedUnit()
+                val isArabicSelected = settingsManager.getLanguage().let { language ->
+                    language == "arabic" || (language == "system" && Locale.getDefault().language == "ar")
+                }
 
                 val (convertedTemp, tempUnitLabel) = convertTemperature(weather.main.temp, tempUnit)
                 val (convertedWindSpeed, windUnitLabel) = convertWindSpeed(weather.wind.speed, windUnit)
 
-                // Translate the weather description
                 val description = WeatherDescriptionMapper.getTranslatedDescription(
                     weather.weather[0].description,
                     isArabicSelected
@@ -166,26 +168,19 @@ class HomeFragment : Fragment() {
                 binding.pressureValueText.text = "${weather.main.pressure} hPa"
                 binding.cloudsValueText.text = "${weather.clouds.all}%"
                 binding.rainValueText.text = "${weather.rain?.oneHour?.toString() ?: "0"} mm"
-            } else {
-                binding.weatherDescText.text = "N/A"
-                binding.weatherIcon.setImageDrawable(null)
-                binding.currentTempText.text = "N/A"
-                binding.humidityValueText.text = "N/A"
-                binding.windSpeedValueText.text = "N/A"
-                binding.pressureValueText.text = "N/A"
-                binding.cloudsValueText.text = "N/A"
-                binding.rainValueText.text = "N/A"
             }
         }
 
         homeViewModel.dailyForecasts.observe(viewLifecycleOwner) { forecasts ->
-            dailyForecastAdapter.submitList(forecasts)
+            dailyForecastAdapter.submitList(forecasts.subList(0,8))
             dailyForecastAdapter.setTemperatureUnit(settingsManager.getTemperatureUnit())
+            updateLanguageSettings()
         }
 
         homeViewModel.weeklySummaries.observe(viewLifecycleOwner) { summaries ->
             weeklyForecastAdapter.submitList(summaries)
             weeklyForecastAdapter.setTemperatureUnit(settingsManager.getTemperatureUnit())
+            updateLanguageSettings()
         }
 
         homeViewModel.lastUpdated.observe(viewLifecycleOwner) { timestamp ->
@@ -238,6 +233,7 @@ class HomeFragment : Fragment() {
         }
         dailyForecastAdapter.setTemperatureUnit(settingsManager.getTemperatureUnit())
         weeklyForecastAdapter.setTemperatureUnit(settingsManager.getTemperatureUnit())
+        updateLanguageSettings()
 
         cityId?.let { id ->
             if (id != 0) {
@@ -335,5 +331,13 @@ class HomeFragment : Fragment() {
                 .load(url)
                 .preload()
         }
+    }
+
+    private fun updateLanguageSettings() {
+        val isArabicSelected = settingsManager.getLanguage().let { language ->
+            language == "arabic" || (language == "system" && Locale.getDefault().language == "ar")
+        }
+        dailyForecastAdapter.setLanguage(isArabicSelected)
+        weeklyForecastAdapter.setLanguage(isArabicSelected)
     }
 }

@@ -43,4 +43,10 @@
     <string name="alerts">التنبيهات</string>
     <string name="favourites">المفضلة</string>
     <string name="settings">الإعدادات</string>
+
+    <string name="data_shown_for_n_a">البيانات المعروضة لـ: غير متاح</string>
+    <string name="unknown">غير معروف</string>
+    <string name="confirm_language_change">تأكيد تغيير اللغة</string>
+    <string name="changing_the_language_will_restart_the_app_proceed">تغيير اللغة سيؤدي إلى إعادة تشغيل التطبيق. هل تريد المتابعة؟</string>
+    <string name="yes">نعم</string>
 </resources>

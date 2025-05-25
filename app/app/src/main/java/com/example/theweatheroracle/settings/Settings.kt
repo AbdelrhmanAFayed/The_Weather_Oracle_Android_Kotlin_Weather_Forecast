@@ -124,9 +124,9 @@ class Settings : AppCompatActivity() {
 
     private fun showLanguageConfirmationDialog(newLanguage: String) {
         AlertDialog.Builder(this)
-            .setTitle("Confirm Language Change")
-            .setMessage("Changing the language will restart the app. Proceed?")
-            .setPositiveButton("Yes") { _, _ ->
+            .setTitle(getString(R.string.confirm_language_change))
+            .setMessage(getString(R.string.changing_the_language_will_restart_the_app_proceed))
+            .setPositiveButton(getString(R.string.yes)) { _, _ ->
                 settingsViewModel.setLanguage(newLanguage)
                 restartApp()
             }

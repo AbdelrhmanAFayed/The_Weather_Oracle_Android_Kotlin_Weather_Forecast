@@ -46,4 +46,7 @@
     <string name="refresh">Refresh</string>
     <string name="data_shown_for_n_a">Data Shown for: N/A</string>
     <string name="unknown">Unknown</string>
+    <string name="confirm_language_change">Confirm Language Change</string>
+    <string name="changing_the_language_will_restart_the_app_proceed">Changing the language will restart the app. Proceed?</string>
+    <string name="yes">Yes</string>
 </resources>
