@@ -1,3 +1,4 @@
+// No changes needed
 package com.example.theweatheroracle.model.settings
 
 import android.content.Context
@@ -6,26 +7,26 @@ import androidx.core.content.edit
 
 class SettingsManager(private val context: Context) : ISettingsManager {
     companion object {
-    private const val PREFS_NAME = "WeatherOraclePrefs"
-    private const val KEY_FIRST_TIME = "first_time"
-    private const val KEY_LOCATION_PERMISSION = "location_permission"
-    private const val KEY_LOCATION = "location"
-    private const val KEY_LANGUAGE = "language"
-    private const val KEY_TEMPERATURE = "temperature"
-    private const val KEY_WIND_SPEED = "wind_speed"
-    private const val KEY_NOTIFICATIONS = "notifications"
-    private const val KEY_CHOSEN_CITY = "chosen_city"
-    private const val KEY_LATITUDE = "latitude"
-    private const val KEY_LONGITUDE = "longitude"
-    private const val DEFAULT_FIRST_TIME = true
-    private const val DEFAULT_LOCATION_PERMISSION = false
-    private const val DEFAULT_LOCATION = "gps"
-    private const val DEFAULT_LANGUAGE = "english"
-    private const val DEFAULT_TEMPERATURE = "celsius"
-    private const val DEFAULT_WIND_SPEED = "ms"
-    private const val DEFAULT_NOTIFICATIONS = "enable"
-    private const val DEFAULT_CHOSEN_CITY = ""
-}
+        private const val PREFS_NAME = "WeatherOraclePrefs"
+        private const val KEY_FIRST_TIME = "first_time"
+        private const val KEY_LOCATION_PERMISSION = "location_permission"
+        private const val KEY_LOCATION = "location"
+        private const val KEY_LANGUAGE = "language"
+        private const val KEY_TEMPERATURE = "temperature"
+        private const val KEY_WIND_SPEED = "wind_speed"
+        private const val KEY_NOTIFICATIONS = "notifications"
+        private const val KEY_CHOSEN_CITY = "chosen_city"
+        private const val KEY_LATITUDE = "latitude"
+        private const val KEY_LONGITUDE = "longitude"
+        private const val DEFAULT_FIRST_TIME = true
+        private const val DEFAULT_LOCATION_PERMISSION = false
+        private const val DEFAULT_LOCATION = "gps"
+        private const val DEFAULT_LANGUAGE = "system" // Changed to "system" as default
+        private const val DEFAULT_TEMPERATURE = "celsius"
+        private const val DEFAULT_WIND_SPEED = "ms"
+        private const val DEFAULT_NOTIFICATIONS = "enable"
+        private const val DEFAULT_CHOSEN_CITY = ""
+    }
 
     private val preferences: SharedPreferences by lazy {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)

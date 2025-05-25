@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -17,182 +18,195 @@
 
             <!-- Location Section -->
             <TextView
+                style="@style/SettingsHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Location"
-                style="@style/SettingsHeader" />
+                android:text="Location" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
                 android:background="@color/dark_gray"
                 android:orientation="vertical"
-                android:padding="8dp"
-                android:layout_marginBottom="16dp">
+                android:padding="8dp">
 
                 <RadioGroup
                     android:id="@+id/location_radio_group"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
+
                     <RadioButton
                         android:id="@+id/location_gps_radio"
+                        style="@style/SettingsRadioButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="GPS"
-                        style="@style/SettingsRadioButton"
-                        android:checked="true" />
+                        android:checked="true"
+                        android:text="GPS" />
+
                     <RadioButton
                         android:id="@+id/location_map_radio"
+                        style="@style/SettingsRadioButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Map"
-                        style="@style/SettingsRadioButton" />
+                        android:text="Map" />
                 </RadioGroup>
             </LinearLayout>
 
-            <!-- Language Section -->
             <TextView
+                style="@style/SettingsHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Language"
-                style="@style/SettingsHeader" />
+                android:text="Language" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
                 android:background="@color/dark_gray"
                 android:orientation="vertical"
-                android:padding="8dp"
-                android:layout_marginBottom="16dp">
+                android:padding="8dp">
 
                 <RadioGroup
-                    android:id="@+id/language_radio_group"
-                    android:layout_width="match_parent"
+                    android:id="@+id/languageRadioGroup"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
+
+                    <RadioButton
+                        android:id="@+id/language_system_radio"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Follow System" />
+
                     <RadioButton
                         android:id="@+id/language_english_radio"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="English"
-                        style="@style/SettingsRadioButton"
-                        android:checked="true" />
+                        android:text="English" />
+
                     <RadioButton
                         android:id="@+id/language_arabic_radio"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Arabic"
-                        style="@style/SettingsRadioButton" />
+                        android:text="Arabic" />
                 </RadioGroup>
             </LinearLayout>
 
             <!-- Temperature Section -->
             <TextView
+                style="@style/SettingsHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Temperature"
-                style="@style/SettingsHeader" />
+                android:text="Temperature" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
                 android:background="@color/dark_gray"
                 android:orientation="vertical"
-                android:padding="8dp"
-                android:layout_marginBottom="16dp">
+                android:padding="8dp">
 
                 <RadioGroup
                     android:id="@+id/temperature_radio_group"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
+
                     <RadioButton
                         android:id="@+id/temperature_celsius_radio"
+                        style="@style/SettingsRadioButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Celsius"
-                        style="@style/SettingsRadioButton"
-                        android:checked="true" />
+                        android:checked="true"
+                        android:text="Celsius" />
+
                     <RadioButton
                         android:id="@+id/temperature_kelvin_radio"
+                        style="@style/SettingsRadioButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Kelvin"
-                        style="@style/SettingsRadioButton" />
+                        android:text="Kelvin" />
+
                     <RadioButton
                         android:id="@+id/temperature_fahrenheit_radio"
+                        style="@style/SettingsRadioButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Fahrenheit"
-                        style="@style/SettingsRadioButton" />
+                        android:text="Fahrenheit" />
                 </RadioGroup>
             </LinearLayout>
 
             <!-- Wind Speed Section -->
             <TextView
+                style="@style/SettingsHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Wind Speed"
-                style="@style/SettingsHeader" />
+                android:text="Wind Speed" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
                 android:background="@color/dark_gray"
                 android:orientation="vertical"
-                android:padding="8dp"
-                android:layout_marginBottom="16dp">
+                android:padding="8dp">
 
                 <RadioGroup
                     android:id="@+id/wind_speed_radio_group"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
+
                     <RadioButton
                         android:id="@+id/wind_speed_ms_radio"
+                        style="@style/SettingsRadioButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Meter / Sec"
-                        style="@style/SettingsRadioButton"
-                        android:checked="true" />
+                        android:checked="true"
+                        android:text="Meter / Sec" />
+
                     <RadioButton
                         android:id="@+id/wind_speed_mph_radio"
+                        style="@style/SettingsRadioButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Mile / Hour"
-                        style="@style/SettingsRadioButton" />
+                        android:text="Mile / Hour" />
                 </RadioGroup>
             </LinearLayout>
 
             <!-- Notifications Section -->
             <TextView
+                style="@style/SettingsHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Notifications"
-                style="@style/SettingsHeader" />
+                android:text="Notifications" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
                 android:background="@color/dark_gray"
                 android:orientation="vertical"
-                android:padding="8dp"
-                android:layout_marginBottom="16dp">
+                android:padding="8dp">
 
                 <RadioGroup
                     android:id="@+id/notifications_radio_group"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
+
                     <RadioButton
                         android:id="@+id/notifications_enable_radio"
+                        style="@style/SettingsRadioButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Enable"
-                        style="@style/SettingsRadioButton"
-                        android:checked="true" />
+                        android:checked="true"
+                        android:text="Enable" />
+
                     <RadioButton
                         android:id="@+id/notifications_disable_radio"
+                        style="@style/SettingsRadioButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Disable"
-                        style="@style/SettingsRadioButton" />
+                        android:text="Disable" />
                 </RadioGroup>
             </LinearLayout>
 

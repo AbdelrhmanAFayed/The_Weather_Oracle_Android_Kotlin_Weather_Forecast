@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
 import android.widget.RadioButton
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -25,7 +26,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
-import androidx.activity.result.ActivityResultLauncher
+import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
     private lateinit var settingsManager: ISettingsManager
@@ -42,6 +43,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         settingsManager = SettingsManager(this)
+        setLocale() // Set locale on startup
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
@@ -89,6 +91,20 @@ class MainActivity : AppCompatActivity() {
 
             override fun onAnimationRepeat(animation: Animator) {}
         })
+    }
+
+    private fun setLocale() {
+        val language = settingsManager.getLanguage()
+        val locale = when (language) {
+            "system" -> Locale.getDefault()
+            "english" -> Locale.ENGLISH
+            "arabic" -> Locale("ar")
+            else -> Locale.ENGLISH // Fallback
+        }
+        Locale.setDefault(locale)
+        val config = resources.configuration
+        config.setLocale(locale)
+        resources.updateConfiguration(config, resources.displayMetrics)
     }
 
     private fun showSetupAlert() {
@@ -141,7 +157,6 @@ class MainActivity : AppCompatActivity() {
         }
         mapDialog.setCancelable(false)
         mapDialog.show(supportFragmentManager, "MapSelectionDialog")
-
     }
 
     private fun areLocationPermissionsGranted(): Boolean {

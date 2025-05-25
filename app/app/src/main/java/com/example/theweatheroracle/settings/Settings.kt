@@ -1,5 +1,7 @@
 package com.example.theweatheroracle.settings
 
+import android.app.AlertDialog
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -9,17 +11,29 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.theweatheroracle.R
 import com.example.theweatheroracle.databinding.ActivitySettingsBinding
 import com.example.theweatheroracle.model.settings.SettingsManager
+import com.example.theweatheroracle.splash.MainActivity
 
 class Settings : AppCompatActivity() {
     private lateinit var binding: ActivitySettingsBinding
     private val settingsViewModel: SettingsViewModel by lazy {
         ViewModelProvider(this, SettingsViewModelFactory(SettingsManager(this))).get(SettingsViewModel::class.java)
     }
+    private var isInitialSetup = true // Flag to ignore initial change
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge() // Enable edge-to-edge display
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // Apply edge-to-edge insets to the root view
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
+
+        // Set up observers
         settingsViewModel.location.observe(this) { location ->
             when (location) {
                 "gps" -> binding.locationRadioGroup.check(R.id.location_gps_radio)
@@ -28,8 +42,14 @@ class Settings : AppCompatActivity() {
         }
         settingsViewModel.language.observe(this) { language ->
             when (language) {
+                "system" -> binding.languageRadioGroup.check(R.id.language_system_radio)
                 "english" -> binding.languageRadioGroup.check(R.id.language_english_radio)
                 "arabic" -> binding.languageRadioGroup.check(R.id.language_arabic_radio)
+            }
+            // After initial check, allow listener to proceed
+            if (isInitialSetup) {
+                isInitialSetup = false
+                setupListeners() // Set up listeners after initial state
             }
         }
         settingsViewModel.temperatureUnit.observe(this) { unit ->
@@ -51,8 +71,9 @@ class Settings : AppCompatActivity() {
                 "disable" -> binding.notificationsRadioGroup.check(R.id.notifications_disable_radio)
             }
         }
+    }
 
-
+    private fun setupListeners() {
         binding.locationRadioGroup.setOnCheckedChangeListener { _, checkedId ->
             settingsViewModel.setLocation(
                 when (checkedId) {
@@ -63,13 +84,15 @@ class Settings : AppCompatActivity() {
             )
         }
         binding.languageRadioGroup.setOnCheckedChangeListener { _, checkedId ->
-            settingsViewModel.setLanguage(
-                when (checkedId) {
+            if (!isInitialSetup) { // Only proceed if not initial setup
+                val newLanguage = when (checkedId) {
+                    R.id.language_system_radio -> "system"
                     R.id.language_english_radio -> "english"
                     R.id.language_arabic_radio -> "arabic"
-                    else -> "english"
+                    else -> "system"
                 }
-            )
+                showLanguageConfirmationDialog(newLanguage)
+            }
         }
         binding.temperatureRadioGroup.setOnCheckedChangeListener { _, checkedId ->
             settingsViewModel.setTemperatureUnit(
@@ -99,5 +122,38 @@ class Settings : AppCompatActivity() {
                 }
             )
         }
+    }
+
+    private fun showLanguageConfirmationDialog(newLanguage: String) {
+        AlertDialog.Builder(this)
+            .setTitle("Confirm Language Change")
+            .setMessage("Changing the language will restart the app. Proceed?")
+            .setPositiveButton("Yes") { _, _ ->
+                settingsViewModel.setLanguage(newLanguage)
+                restartApp()
+            }
+            .setNegativeButton("No") { dialog, _ ->
+                // Revert to current language
+                settingsViewModel.language.value?.let { currentLanguage ->
+                    binding.languageRadioGroup.check(
+                        when (currentLanguage) {
+                            "system" -> R.id.language_system_radio
+                            "english" -> R.id.language_english_radio
+                            "arabic" -> R.id.language_arabic_radio
+                            else -> R.id.language_system_radio
+                        }
+                    )
+                }
+                dialog.dismiss()
+            }
+            .setCancelable(false)
+            .show()
+    }
+
+    private fun restartApp() {
+        val intent = Intent(this, MainActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(intent)
+        finish()
     }
 }
