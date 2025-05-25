@@ -43,4 +43,7 @@
     <string name="alerts">Alerts</string>
     <string name="favourites">Favourites</string>
     <string name="settings">Settings</string>
+    <string name="refresh">Refresh</string>
+    <string name="data_shown_for_n_a">Data Shown for: N/A</string>
+    <string name="unknown">Unknown</string>
 </resources>
