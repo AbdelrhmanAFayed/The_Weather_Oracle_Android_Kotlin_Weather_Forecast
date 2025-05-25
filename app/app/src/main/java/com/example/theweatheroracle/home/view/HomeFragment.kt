@@ -1,10 +1,14 @@
 package com.example.theweatheroracle.home.view
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -20,6 +24,8 @@ import com.example.theweatheroracle.model.network.INetworkObserver
 import com.example.theweatheroracle.model.network.NetworkObserver
 import com.example.theweatheroracle.model.settings.ISettingsManager
 import com.example.theweatheroracle.model.settings.SettingsManager
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -30,19 +36,35 @@ class HomeFragment : Fragment() {
     private lateinit var dailyForecastAdapter: DailyForecastAdapter
     private lateinit var weeklyForecastAdapter: WeeklyForecastAdapter
     private lateinit var settingsManager: ISettingsManager
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
     private var cityId: Int? = null
+    private var isUsingGps: Boolean = false
+
+    private val locationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            fetchCurrentLocation()
+        } else {
+            Log.w("HomeFragment", "Location permission denied")
+            refreshDataWithoutGps()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         settingsManager = SettingsManager(requireContext())
-        updateLocationData()
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
-        val factory = HomeViewModelFactory(WeatherRepositoryImp.getInstance(
-            WeatherRemoteDataSourceImpl,
-            WeatherLocalDataSourceImpl.getInstance(requireContext())
-        ))
+        val factory = HomeViewModelFactory(
+            WeatherRepositoryImp.getInstance(
+                WeatherRemoteDataSourceImpl,
+                WeatherLocalDataSourceImpl.getInstance(requireContext())
+            ),
+            settingsManager
+        )
         homeViewModel = ViewModelProvider(this, factory)[HomeViewModel::class.java]
 
         dailyForecastAdapter = DailyForecastAdapter()
@@ -53,31 +75,43 @@ class HomeFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
-        val view = binding.root
         networkObserver = NetworkObserver(requireContext())
-        return view
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val connectivityManager = requireContext().getSystemService(android.content.Context.CONNECTIVITY_SERVICE) as android.net.ConnectivityManager
-        val isInitiallyOnline = connectivityManager.activeNetwork != null
-        refreshData(isInitiallyOnline)
+        setupObservers()
+        setupRecyclerViews()
+        updateLocationData()
+        refreshData()
+    }
 
+    override fun onResume() {
+        super.onResume()
+        updateLocationData()
+        refreshData()
+    }
+
+    private fun setupObservers() {
         viewLifecycleOwner.lifecycleScope.launch {
             networkObserver.observe().collectLatest { status ->
                 Log.d("NetworkTest", "Network Status: $status")
                 when (status) {
                     INetworkObserver.Status.Available, INetworkObserver.Status.Losing -> {
-                        homeViewModel.fetchWeatherData(latitude, longitude)
+                        if (isUsingGps) {
+                            fetchCurrentLocation()
+                        } else {
+                            homeViewModel.refreshData(latitude, longitude, cityId, isUsingGps, isOnline())
+                        }
                     }
                     INetworkObserver.Status.Unavailable, INetworkObserver.Status.Lost -> {
                         cityId?.let { id ->
                             if (id != 0) {
-                                homeViewModel.fetchWeatherByCityIdFromDb(id)
+                                homeViewModel.refreshData(latitude, longitude, cityId, isUsingGps, false)
                             } else {
                                 Log.w("HomeFragment", "Invalid cityId (0) for database fetch")
                             }
@@ -89,20 +123,9 @@ class HomeFragment : Fragment() {
             }
         }
 
-        cityId?.let { id ->
-            if (id != 0) {
-                homeViewModel.cleanOldForecasts(id)
-            }
-        }
-
         homeViewModel.city.observe(viewLifecycleOwner) { city ->
             Log.d("HomeFragment", "City observed: $city")
             binding.cityNameText.text = city?.name ?: "Unknown"
-            // Only update cityId and SettingsManager if the city is not null
-            if (city != null) {
-                cityId = city.id
-                settingsManager.setChosenCity(city.id.toString())
-            }
         }
 
         homeViewModel.weather.observe(viewLifecycleOwner) { weather ->
@@ -123,6 +146,15 @@ class HomeFragment : Fragment() {
                 binding.pressureValueText.text = "${weather.main.pressure} hPa"
                 binding.cloudsValueText.text = "${weather.clouds.all}%"
                 binding.rainValueText.text = "${weather.rain?.oneHour?.toString() ?: "0"} mm"
+            } else {
+                binding.weatherDescText.text = "N/A"
+                binding.weatherIcon.setImageDrawable(null)
+                binding.currentTempText.text = "N/A"
+                binding.humidityValueText.text = "N/A"
+                binding.windSpeedValueText.text = "N/A"
+                binding.pressureValueText.text = "N/A"
+                binding.cloudsValueText.text = "N/A"
+                binding.rainValueText.text = "N/A"
             }
         }
 
@@ -135,7 +167,9 @@ class HomeFragment : Fragment() {
             weeklyForecastAdapter.submitList(summaries)
             weeklyForecastAdapter.setTemperatureUnit(settingsManager.getTemperatureUnit())
         }
+    }
 
+    private fun setupRecyclerViews() {
         binding.dailyForecastList.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         binding.dailyForecastList.adapter = dailyForecastAdapter
 
@@ -143,32 +177,89 @@ class HomeFragment : Fragment() {
         binding.weeklyForecastList.adapter = weeklyForecastAdapter
     }
 
-    override fun onResume() {
-        super.onResume()
-        updateLocationData()
-        refreshData(isOnline())
+    private fun updateLocationData() {
+        isUsingGps = settingsManager.getLocation().lowercase() == "gps"
+        if (isUsingGps) {
+            settingsManager.setChosenCity("")
+            cityId = null
+            checkLocationPermission()
+        } else {
+            latitude = settingsManager.getLatitude() ?: 0.0
+            longitude = settingsManager.getLongitude() ?: 0.0
+            cityId = settingsManager.getChosenCity().toIntOrNull()
+            Log.d("HomeFragment", "Using map mode: cityId=$cityId, lat=$latitude, lon=$longitude")
+        }
     }
 
-    private fun updateLocationData() {
+    private fun refreshData() {
+        if (isUsingGps) {
+            fetchCurrentLocation()
+        } else {
+            val isOnline = isOnline()
+            if (cityId != null && cityId != 0) {
+                homeViewModel.refreshData(latitude, longitude, cityId, isUsingGps, isOnline)
+            } else {
+                Log.w("HomeFragment", "No cityId available for refresh")
+            }
+        }
+
+        cityId?.let { id ->
+            if (id != 0) {
+                homeViewModel.cleanOldForecasts(id)
+            }
+        }
+    }
+
+    private fun refreshDataWithoutGps() {
         latitude = settingsManager.getLatitude() ?: 0.0
         longitude = settingsManager.getLongitude() ?: 0.0
         cityId = settingsManager.getChosenCity().toIntOrNull()
-        Log.d("HomeFragment", "Updated location data: cityId=$cityId, lat=$latitude, lon=$longitude")
+        if (cityId != null && cityId != 0) {
+            homeViewModel.refreshData(latitude, longitude, cityId, isUsingGps, isOnline())
+        } else {
+            Log.w("HomeFragment", "No cityId available for refresh without GPS")
+        }
     }
 
-    private fun refreshData(isOnline: Boolean) {
-        if (isOnline) {
-            homeViewModel.fetchWeatherData(latitude, longitude)
-        } else {
-            cityId?.let { id ->
-                if (id != 0) {
-                    homeViewModel.fetchWeatherByCityIdFromDb(id)
-                } else {
-                    Log.w("HomeFragment", "Invalid cityId (0) for database fetch")
-                }
-            } ?: run {
-                Log.w("HomeFragment", "No cityId available for database fetch")
+    private fun checkLocationPermission() {
+        when {
+            ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED -> {
+                fetchCurrentLocation()
             }
+            shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION) -> {
+                Log.w("HomeFragment", "Location permission rationale should be shown")
+                locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            }
+            else -> {
+                locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            }
+        }
+    }
+
+    private fun fetchCurrentLocation() {
+        try {
+            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                if (location != null) {
+                    latitude = location.latitude
+                    longitude = location.longitude
+                    Log.d("HomeFragment", "Current location: lat=$latitude, lon=$longitude")
+                    settingsManager.setLatitude(latitude)
+                    settingsManager.setLongitude(longitude)
+                    homeViewModel.refreshData(latitude, longitude, null, isUsingGps, isOnline())
+                } else {
+                    Log.w("HomeFragment", "Location is null")
+                    refreshDataWithoutGps()
+                }
+            }.addOnFailureListener { e ->
+                Log.e("HomeFragment", "Failed to get location: ${e.message}")
+                refreshDataWithoutGps()
+            }
+        } catch (e: SecurityException) {
+            Log.e("HomeFragment", "Location permission not granted: ${e.message}")
+            refreshDataWithoutGps()
         }
     }
 

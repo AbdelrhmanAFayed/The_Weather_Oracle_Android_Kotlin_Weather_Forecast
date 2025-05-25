@@ -6,12 +6,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.theweatheroracle.home.view.DailySummary
+import com.example.theweatheroracle.model.City
 import com.example.theweatheroracle.model.Forecast
 import com.example.theweatheroracle.model.WeatherForecastResponse
 import com.example.theweatheroracle.model.WeatherRepository
-import com.example.theweatheroracle.model.City
 import com.example.theweatheroracle.model.WeatherResponse
 import com.example.theweatheroracle.model.settings.ISettingsManager
+import com.example.theweatheroracle.model.*
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -20,18 +21,20 @@ import java.util.Locale
 import java.util.TimeZone
 
 class HomeViewModelFactory(
-    private val repository: WeatherRepository
+    private val repository: WeatherRepository,
+    private val settingsManager: ISettingsManager
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(HomeViewModel::class.java)) {
-            return HomeViewModel(repository) as T
+            return HomeViewModel(repository, settingsManager) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
 
 class HomeViewModel(
-    private val repository: WeatherRepository
+    private val repository: WeatherRepository,
+    private val settingsManager: ISettingsManager
 ) : ViewModel() {
     private val _city = MutableLiveData<City?>()
     val city: LiveData<City?> = _city
@@ -45,48 +48,146 @@ class HomeViewModel(
     private val _weeklySummaries = MutableLiveData<List<DailySummary>>()
     val weeklySummaries: LiveData<List<DailySummary>> = _weeklySummaries
 
-    fun fetchWeatherData(latitude: Double, longitude: Double) {
+    fun refreshData(latitude: Double, longitude: Double, cityId: Int?, useGps: Boolean, isOnline: Boolean) {
         viewModelScope.launch {
-            val forecastResult = repository.fetchWeatherForecast(latitude, longitude, "standard", null, null, null)
-            forecastResult.onSuccess { forecastResponse ->
-                _city.postValue(forecastResponse.city)
-                _dailyForecasts.postValue(forecastResponse.list)
-                _weeklySummaries.postValue(computeWeeklySummaries(forecastResponse.list))
-            }
-            val weatherResult = repository.fetchWeatherByLatLon(latitude, longitude, "standard", null, null)
-            weatherResult.onSuccess { weatherResponse ->
-                _weather.postValue(weatherResponse)
-                _city.postValue(
-                    City(
-                        id = weatherResponse.id,
-                        name = weatherResponse.name,
-                        coord = weatherResponse.coord,
-                        country = weatherResponse.sys.country ?: "",
-                        population = 0,
-                        timezone = weatherResponse.timezone,
-                        sunrise = weatherResponse.sys.sunrise ?: 0,
-                        sunset = weatherResponse.sys.sunset ?: 0
-                    )
-                )
+            if (useGps || cityId == null || cityId == 0) {
+                fetchWeatherData(latitude, longitude, isOnline)
+            } else {
+                if (isOnline) {
+                    fetchWeatherByCityId(cityId)
+                } else {
+                    fetchWeatherByCityIdFromDb(cityId)
+                }
             }
         }
     }
 
-     fun fetchWeatherByCityIdFromDb(cityId: Int) {
-         viewModelScope.launch {
-             val city = repository.getCityById(cityId)
-             if (city != null) {
-                 _city.postValue(city) // Ensure city is emitted
-                 val forecasts = repository.getForecastsForCity(cityId)
-                 _dailyForecasts.postValue(forecasts)
-                 _weeklySummaries.postValue(computeWeeklySummaries(forecasts))
-             } else {
-                 _city.postValue(null)
-                 _dailyForecasts.postValue(emptyList())
-                 _weeklySummaries.postValue(emptyList())
-             }
-         }
-     }
+    fun fetchWeatherData(latitude: Double, longitude: Double, isOnline: Boolean) {
+        viewModelScope.launch {
+            val forecastResult = repository.fetchWeatherForecast(latitude, longitude)
+            forecastResult.onSuccess { forecastResponse ->
+                _city.postValue(forecastResponse.city)
+                _dailyForecasts.postValue(forecastResponse.list)
+                _weeklySummaries.postValue(computeWeeklySummaries(forecastResponse.list))
+            }.onFailure {
+                _city.postValue(null)
+                _dailyForecasts.postValue(emptyList())
+                _weeklySummaries.postValue(emptyList())
+            }
+
+            if (isOnline) {
+                val weatherResult = repository.fetchWeatherByLatLon(latitude, longitude)
+                if (weatherResult.isSuccess) {
+                    weatherResult.onSuccess { weatherResponse ->
+                        _weather.postValue(weatherResponse)
+                        _city.postValue(
+                            City(
+                                id = weatherResponse.id,
+                                name = weatherResponse.name,
+                                coord = weatherResponse.coord,
+                                country = weatherResponse.sys.country ?: "",
+                                population = 0,
+                                timezone = weatherResponse.timezone,
+                                sunrise = weatherResponse.sys.sunrise ?: 0,
+                                sunset = weatherResponse.sys.sunset ?: 0
+                            )
+                        )
+                    }
+                } else {
+                    // Fallback to forecast data if API fails
+                    val city = _city.value
+                    if (city != null) {
+                        val currentDt = System.currentTimeMillis() / 1000
+                        val forecasts = repository.getForecastsForCityAfterDt(city.id, currentDt)
+                        val latestForecast = forecasts.minByOrNull { it.dt }
+                        _weather.postValue(latestForecast?.toWeatherResponse(city))
+                    } else {
+                        _weather.postValue(null)
+                    }
+                }
+            } else {
+                // Offline: Use forecast data
+                val city = _city.value
+                if (city != null) {
+                    val currentDt = System.currentTimeMillis() / 1000
+                    val forecasts = repository.getForecastsForCityAfterDt(city.id, currentDt)
+                    val latestForecast = forecasts.minByOrNull { it.dt }
+                    _weather.postValue(latestForecast?.toWeatherResponse(city))
+                } else {
+                    _weather.postValue(null)
+                }
+            }
+        }
+    }
+
+    fun fetchWeatherByCityId(cityId: Int) {
+        viewModelScope.launch {
+            val forecastResult = repository.fetchForecastByCityId(cityId)
+            forecastResult.onSuccess { forecastResponse ->
+                _city.postValue(forecastResponse.city)
+                _dailyForecasts.postValue(forecastResponse.list)
+                _weeklySummaries.postValue(computeWeeklySummaries(forecastResponse.list))
+            }.onFailure {
+                _city.postValue(null)
+                _dailyForecasts.postValue(emptyList())
+                _weeklySummaries.postValue(emptyList())
+            }
+
+            val weatherResult = repository.fetchWeatherByCityId(cityId)
+            if (weatherResult.isSuccess) {
+                weatherResult.onSuccess { weatherResponse ->
+                    _weather.postValue(weatherResponse)
+                    _city.postValue(
+                        City(
+                            id = weatherResponse.id,
+                            name = weatherResponse.name,
+                            coord = weatherResponse.coord,
+                            country = weatherResponse.sys.country ?: "",
+                            population = 0,
+                            timezone = weatherResponse.timezone,
+                            sunrise = weatherResponse.sys.sunrise ?: 0,
+                            sunset = weatherResponse.sys.sunset ?: 0
+                        )
+                    )
+                }
+            } else {
+                // Fallback to forecast data if API fails
+                val city = _city.value
+                if (city != null) {
+                    val currentDt = System.currentTimeMillis() / 1000
+                    val forecasts = repository.getForecastsForCityAfterDt(city.id, currentDt)
+                    val latestForecast = forecasts.minByOrNull { it.dt }
+                    _weather.postValue(latestForecast?.toWeatherResponse(city))
+                } else {
+                    _weather.postValue(null)
+                }
+            }
+        }
+    }
+
+    fun fetchWeatherByCityIdFromDb(cityId: Int) {
+        viewModelScope.launch {
+            val city = repository.getCityById(cityId)
+            if (city != null) {
+                _city.postValue(city)
+                val forecasts = repository.getForecastsForCity(cityId)
+                _dailyForecasts.postValue(forecasts)
+                _weeklySummaries.postValue(computeWeeklySummaries(forecasts))
+
+                // Offline: Use forecast data
+                val currentDt = System.currentTimeMillis() / 1000
+                val futureForecasts = repository.getForecastsForCityAfterDt(cityId, currentDt)
+                val latestForecast = futureForecasts.minByOrNull { it.dt }
+                _weather.postValue(latestForecast?.toWeatherResponse(city))
+            } else {
+                _city.postValue(null)
+                _dailyForecasts.postValue(emptyList())
+                _weeklySummaries.postValue(emptyList())
+                _weather.postValue(null)
+            }
+        }
+    }
+
     fun cleanOldForecasts(cityId: Int) {
         viewModelScope.launch {
             repository.deleteForecastsForCityBeforeDt(
@@ -111,4 +212,23 @@ class HomeViewModel(
             DailySummary(day, minTemp, maxTemp, icon)
         }
     }
+}
+
+fun Forecast.toWeatherResponse(city: City): WeatherResponse {
+    return WeatherResponse(
+        coord = city.coord,
+        weather = this.weather,
+        main = this.main,
+        wind = this.wind,
+        clouds = this.clouds,
+        rain = CurrentRain(oneHour = this.rain?.threeHours ?: 0.0),
+        dt = this.dt,
+        sys = this.sys ,
+        timezone = city.timezone,
+        id = city.id,
+        name = city.name,
+        base = "",
+        visibility = 0,
+        cod = 0
+    )
 }
