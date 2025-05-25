@@ -90,6 +90,7 @@ class HomeFragment : Fragment() {
 
         setupObservers()
         setupRecyclerViews()
+        setupRefreshButton()
         updateLocationData()
         refreshData()
     }
@@ -186,6 +187,14 @@ class HomeFragment : Fragment() {
             weeklyForecastAdapter.submitList(summaries)
             weeklyForecastAdapter.setTemperatureUnit(settingsManager.getTemperatureUnit())
         }
+
+        homeViewModel.lastUpdated.observe(viewLifecycleOwner) { timestamp ->
+            binding.lastUpdatedText.text = if (timestamp != null) {
+                "Last Updated: $timestamp"
+            } else {
+                "Last Updated: N/A"
+            }
+        }
     }
 
     private fun setupRecyclerViews() {
@@ -194,6 +203,12 @@ class HomeFragment : Fragment() {
 
         binding.weeklyForecastList.layoutManager = LinearLayoutManager(context)
         binding.weeklyForecastList.adapter = weeklyForecastAdapter
+    }
+
+    private fun setupRefreshButton() {
+        binding.refreshButton.setOnClickListener {
+            refreshData()
+        }
     }
 
     private fun updateLocationData() {

@@ -48,6 +48,15 @@ class HomeViewModel(
     private val _weeklySummaries = MutableLiveData<List<DailySummary>>()
     val weeklySummaries: LiveData<List<DailySummary>> = _weeklySummaries
 
+    private val _lastUpdated = MutableLiveData<String?>()
+    val lastUpdated: LiveData<String?> = _lastUpdated
+
+    private fun updateLastUpdatedTimestamp(timestamp: Long) {
+        val sdf = SimpleDateFormat("dd MMM yyyy, hh:mm a", Locale.getDefault())
+        sdf.timeZone = TimeZone.getDefault()
+        _lastUpdated.postValue(sdf.format(Date(timestamp * 1000)))
+    }
+
     fun refreshData(latitude: Double, longitude: Double, cityId: Int?, useGps: Boolean, isOnline: Boolean) {
         viewModelScope.launch {
             if (useGps || cityId == null || cityId == 0) {
@@ -69,10 +78,14 @@ class HomeViewModel(
                 _city.postValue(forecastResponse.city)
                 _dailyForecasts.postValue(forecastResponse.list)
                 _weeklySummaries.postValue(computeWeeklySummaries(forecastResponse.list))
+                // Use the timestamp of the first forecast or current time
+                val timestamp = forecastResponse.list.firstOrNull()?.dt ?: (System.currentTimeMillis() / 1000)
+                updateLastUpdatedTimestamp(timestamp)
             }.onFailure {
                 _city.postValue(null)
                 _dailyForecasts.postValue(emptyList())
                 _weeklySummaries.postValue(emptyList())
+                _lastUpdated.postValue(null)
             }
 
             if (isOnline) {
@@ -92,6 +105,7 @@ class HomeViewModel(
                                 sunset = weatherResponse.sys.sunset ?: 0
                             )
                         )
+                        updateLastUpdatedTimestamp(weatherResponse.dt)
                     }
                 } else {
                     val city = _city.value
@@ -100,8 +114,10 @@ class HomeViewModel(
                         val forecasts = repository.getForecastsForCityAfterDt(city.id, currentDt)
                         val latestForecast = forecasts.minByOrNull { it.dt }
                         _weather.postValue(latestForecast?.toWeatherResponse(city))
+                        latestForecast?.let { updateLastUpdatedTimestamp(it.dt) }
                     } else {
                         _weather.postValue(null)
+                        _lastUpdated.postValue(null)
                     }
                 }
             } else {
@@ -111,8 +127,10 @@ class HomeViewModel(
                     val forecasts = repository.getForecastsForCityAfterDt(city.id, currentDt)
                     val latestForecast = forecasts.minByOrNull { it.dt }
                     _weather.postValue(latestForecast?.toWeatherResponse(city))
+                    latestForecast?.let { updateLastUpdatedTimestamp(it.dt) }
                 } else {
                     _weather.postValue(null)
+                    _lastUpdated.postValue(null)
                 }
             }
         }
@@ -125,10 +143,13 @@ class HomeViewModel(
                 _city.postValue(forecastResponse.city)
                 _dailyForecasts.postValue(forecastResponse.list)
                 _weeklySummaries.postValue(computeWeeklySummaries(forecastResponse.list))
+                val timestamp = forecastResponse.list.firstOrNull()?.dt ?: (System.currentTimeMillis() / 1000)
+                updateLastUpdatedTimestamp(timestamp)
             }.onFailure {
                 _city.postValue(null)
                 _dailyForecasts.postValue(emptyList())
                 _weeklySummaries.postValue(emptyList())
+                _lastUpdated.postValue(null)
             }
 
             val weatherResult = repository.fetchWeatherByCityId(cityId)
@@ -147,6 +168,7 @@ class HomeViewModel(
                             sunset = weatherResponse.sys.sunset ?: 0
                         )
                     )
+                    updateLastUpdatedTimestamp(weatherResponse.dt)
                 }
             } else {
                 val city = _city.value
@@ -155,8 +177,10 @@ class HomeViewModel(
                     val forecasts = repository.getForecastsForCityAfterDt(city.id, currentDt)
                     val latestForecast = forecasts.minByOrNull { it.dt }
                     _weather.postValue(latestForecast?.toWeatherResponse(city))
+                    latestForecast?.let { updateLastUpdatedTimestamp(it.dt) }
                 } else {
                     _weather.postValue(null)
+                    _lastUpdated.postValue(null)
                 }
             }
         }
@@ -175,11 +199,13 @@ class HomeViewModel(
                 val futureForecasts = repository.getForecastsForCityAfterDt(cityId, currentDt)
                 val latestForecast = futureForecasts.minByOrNull { it.dt }
                 _weather.postValue(latestForecast?.toWeatherResponse(city))
+                latestForecast?.let { updateLastUpdatedTimestamp(it.dt) }
             } else {
                 _city.postValue(null)
                 _dailyForecasts.postValue(emptyList())
                 _weeklySummaries.postValue(emptyList())
                 _weather.postValue(null)
+                _lastUpdated.postValue(null)
             }
         }
     }
