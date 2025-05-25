@@ -47,6 +47,8 @@ class MapSelectionDialogFragment : DialogFragment() {
             WeatherRemoteDataSourceImpl,
             WeatherLocalDataSourceImpl.getInstance(requireContext())
         )))[MapViewModel::class.java]
+
+        settingsManager = SettingsManager(requireContext())
     }
 
     override fun onCreateView(
