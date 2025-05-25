@@ -69,6 +69,8 @@ class HomeFragment : Fragment() {
 
         dailyForecastAdapter = DailyForecastAdapter()
         weeklyForecastAdapter = WeeklyForecastAdapter()
+
+        preloadWeatherIcons()
     }
 
     override fun onCreateView(
@@ -280,6 +282,23 @@ class HomeFragment : Fragment() {
         return when (unit.lowercase()) {
             "mph" -> (ms * 2.23694) to "mph"
             else -> ms to "m/s"
+        }
+    }
+    private fun preloadWeatherIcons() {
+        val baseUrl = "https://openweathermap.org/img/wn/"
+        val validIconCodes = listOf("01", "02", "03", "04", "09", "10", "11", "13", "50")
+        val suffixes = listOf("d", "n")
+
+        val urls = validIconCodes.flatMap { code ->
+            suffixes.map { suffix ->
+                "$baseUrl${code}${suffix}@2x.png"
+            }
+        }
+
+        urls.forEach { url ->
+            Glide.with(this)
+                .load(url)
+                .preload()
         }
     }
 }
