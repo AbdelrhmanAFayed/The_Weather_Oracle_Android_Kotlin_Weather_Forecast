@@ -1,4 +1,4 @@
-package com.example.theweatheroracle.model
+package com.example.theweatheroracle.model.weather
 
 interface WeatherRepository {
     suspend fun fetchWeatherForecast(

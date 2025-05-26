@@ -1,7 +1,7 @@
 package com.example.theweatheroracle.model.api
 
-import com.example.theweatheroracle.model.WeatherForecastResponse
-import com.example.theweatheroracle.model.WeatherResponse
+import com.example.theweatheroracle.model.weather.WeatherForecastResponse
+import com.example.theweatheroracle.model.weather.WeatherResponse
 
 interface WeatherRemoteDataSource {
     suspend fun fetchWeatherByLatLon(

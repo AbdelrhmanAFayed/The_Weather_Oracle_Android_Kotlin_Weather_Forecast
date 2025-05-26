@@ -1,8 +1,8 @@
 package com.example.theweatheroracle.model.api
 
 import com.example.theweatheroracle.BuildConfig
-import com.example.theweatheroracle.model.WeatherForecastResponse
-import com.example.theweatheroracle.model.WeatherResponse
+import com.example.theweatheroracle.model.weather.WeatherForecastResponse
+import com.example.theweatheroracle.model.weather.WeatherResponse
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query

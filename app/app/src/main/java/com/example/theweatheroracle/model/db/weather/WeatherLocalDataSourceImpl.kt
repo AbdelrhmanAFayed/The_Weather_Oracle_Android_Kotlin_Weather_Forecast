@@ -1,16 +1,17 @@
-package com.example.theweatheroracle.model.db
+package com.example.theweatheroracle.model.db.weather
 
 import android.content.Context
-import com.example.theweatheroracle.model.City
-import com.example.theweatheroracle.model.Forecast
-import com.example.theweatheroracle.model.ForecastEntity
-import com.example.theweatheroracle.model.Weather
-import com.example.theweatheroracle.model.WeatherEntryEntity
+import com.example.theweatheroracle.model.db.AppDatabase
+import com.example.theweatheroracle.model.weather.City
+import com.example.theweatheroracle.model.weather.Forecast
+import com.example.theweatheroracle.model.weather.ForecastEntity
+import com.example.theweatheroracle.model.weather.Weather
+import com.example.theweatheroracle.model.weather.WeatherEntryEntity
 
 class WeatherLocalDataSourceImpl private constructor(
     private val context: Context
 ) : WeatherLocalDataSource {
-    private val appDatabase: AppDatabase by lazy { AppDatabase.getDatabase(context) }
+    private val appDatabase: AppDatabase by lazy { AppDatabase.Companion.getDatabase(context) }
     private val cityDao: CityDao by lazy { appDatabase.cityDao() }
     private val forecastEntityDao: ForecastEntityDao by lazy { appDatabase.forecastEntityDao() }
     private val weatherEntryEntityDao: WeatherEntryEntityDao by lazy { appDatabase.weatherEntryEntityDao() }

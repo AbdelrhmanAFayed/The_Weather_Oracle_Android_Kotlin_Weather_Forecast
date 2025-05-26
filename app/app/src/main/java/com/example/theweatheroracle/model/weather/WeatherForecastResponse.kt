@@ -1,4 +1,4 @@
-package com.example.theweatheroracle.model
+package com.example.theweatheroracle.model.weather
 
 import android.os.Parcelable
 import androidx.room.Embedded

@@ -1,6 +1,6 @@
-package com.example.theweatheroracle.model
+package com.example.theweatheroracle.model.weather
 
-import com.example.theweatheroracle.model.db.WeatherLocalDataSource
+import com.example.theweatheroracle.model.db.weather.WeatherLocalDataSource
 import com.example.theweatheroracle.model.api.WeatherRemoteDataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

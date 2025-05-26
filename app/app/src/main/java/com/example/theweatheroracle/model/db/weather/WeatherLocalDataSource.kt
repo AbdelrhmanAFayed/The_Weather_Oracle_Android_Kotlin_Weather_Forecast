@@ -1,8 +1,8 @@
-package com.example.theweatheroracle.model.db
+package com.example.theweatheroracle.model.db.weather
 
-import com.example.theweatheroracle.model.City
-import com.example.theweatheroracle.model.Forecast
-import com.example.theweatheroracle.model.Weather
+import com.example.theweatheroracle.model.weather.City
+import com.example.theweatheroracle.model.weather.Forecast
+import com.example.theweatheroracle.model.weather.Weather
 
 interface WeatherLocalDataSource {
     suspend fun saveCity(city: City)
