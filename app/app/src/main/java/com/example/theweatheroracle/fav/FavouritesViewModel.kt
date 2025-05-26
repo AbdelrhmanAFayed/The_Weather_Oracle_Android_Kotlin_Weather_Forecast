@@ -5,8 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.theweatheroracle.model.City
-import com.example.theweatheroracle.model.WeatherRepository
+import com.example.theweatheroracle.model.weather.City
+import com.example.theweatheroracle.model.weather.WeatherRepository
 import com.example.theweatheroracle.model.settings.ISettingsManager
 import kotlinx.coroutines.launch
 

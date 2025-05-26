@@ -19,9 +19,9 @@ import com.example.theweatheroracle.lan.LocaleUtils
 import com.example.theweatheroracle.map.MapSelectionDialogFragment
 import com.example.theweatheroracle.map.MapViewModel
 import com.example.theweatheroracle.map.MapViewModelFactory
-import com.example.theweatheroracle.model.WeatherRepositoryImp
+import com.example.theweatheroracle.model.weather.WeatherRepositoryImp
 import com.example.theweatheroracle.model.api.WeatherRemoteDataSourceImpl
-import com.example.theweatheroracle.model.db.WeatherLocalDataSourceImpl
+import com.example.theweatheroracle.model.db.weather.WeatherLocalDataSourceImpl
 import com.example.theweatheroracle.settings.Settings
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar

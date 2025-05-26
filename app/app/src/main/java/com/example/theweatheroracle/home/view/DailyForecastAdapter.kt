@@ -7,8 +7,8 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.theweatheroracle.databinding.DailyForecastItemBinding
-import com.example.theweatheroracle.model.Forecast
-import com.example.theweatheroracle.model.WeatherDescriptionMapper
+import com.example.theweatheroracle.model.weather.Forecast
+import com.example.theweatheroracle.model.weather.WeatherDescriptionMapper
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

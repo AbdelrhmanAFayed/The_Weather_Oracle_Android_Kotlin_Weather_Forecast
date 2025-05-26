@@ -3,9 +3,7 @@ package com.example.theweatheroracle.map
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.theweatheroracle.model.City
-import com.example.theweatheroracle.model.Coord
-import com.example.theweatheroracle.model.WeatherRepository
+import com.example.theweatheroracle.model.weather.WeatherRepository
 import kotlinx.coroutines.launch
 
 @Suppress("UNCHECKED_CAST")

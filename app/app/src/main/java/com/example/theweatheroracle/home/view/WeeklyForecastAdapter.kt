@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.theweatheroracle.databinding.WeeklyForecastItemBinding
-import com.example.theweatheroracle.model.WeatherDescriptionMapper
 
 data class DailySummary(
     val day: String,

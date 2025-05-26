@@ -1,10 +1,8 @@
 package com.example.theweatheroracle.map
 
-import android.app.Dialog
 import android.content.DialogInterface
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,9 +11,9 @@ import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.theweatheroracle.R
-import com.example.theweatheroracle.model.WeatherRepositoryImp
+import com.example.theweatheroracle.model.weather.WeatherRepositoryImp
 import com.example.theweatheroracle.model.api.WeatherRemoteDataSourceImpl
-import com.example.theweatheroracle.model.db.WeatherLocalDataSourceImpl
+import com.example.theweatheroracle.model.db.weather.WeatherLocalDataSourceImpl
 import com.example.theweatheroracle.model.settings.ISettingsManager
 import com.example.theweatheroracle.model.settings.SettingsManager
 import org.osmdroid.config.Configuration

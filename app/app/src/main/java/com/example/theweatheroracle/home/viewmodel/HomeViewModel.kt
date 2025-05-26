@@ -6,12 +6,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.theweatheroracle.home.view.DailySummary
-import com.example.theweatheroracle.model.City
-import com.example.theweatheroracle.model.CurrentRain
-import com.example.theweatheroracle.model.Forecast
-import com.example.theweatheroracle.model.WeatherForecastResponse
-import com.example.theweatheroracle.model.WeatherResponse
-import com.example.theweatheroracle.model.WeatherRepository
+import com.example.theweatheroracle.model.weather.City
+import com.example.theweatheroracle.model.weather.CurrentRain
+import com.example.theweatheroracle.model.weather.Forecast
+import com.example.theweatheroracle.model.weather.WeatherResponse
+import com.example.theweatheroracle.model.weather.WeatherRepository
 import com.example.theweatheroracle.model.settings.ISettingsManager
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat

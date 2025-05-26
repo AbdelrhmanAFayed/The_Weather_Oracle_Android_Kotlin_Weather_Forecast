@@ -17,10 +17,10 @@ import com.bumptech.glide.Glide
 import com.example.theweatheroracle.databinding.FragmentHomeBinding
 import com.example.theweatheroracle.home.viewmodel.HomeViewModel
 import com.example.theweatheroracle.home.viewmodel.HomeViewModelFactory
-import com.example.theweatheroracle.model.WeatherDescriptionMapper
-import com.example.theweatheroracle.model.WeatherRepositoryImp
+import com.example.theweatheroracle.model.weather.WeatherDescriptionMapper
+import com.example.theweatheroracle.model.weather.WeatherRepositoryImp
 import com.example.theweatheroracle.model.api.WeatherRemoteDataSourceImpl
-import com.example.theweatheroracle.model.db.WeatherLocalDataSourceImpl
+import com.example.theweatheroracle.model.db.weather.WeatherLocalDataSourceImpl
 import com.example.theweatheroracle.model.network.INetworkObserver
 import com.example.theweatheroracle.model.network.NetworkObserver
 import com.example.theweatheroracle.model.settings.ISettingsManager
