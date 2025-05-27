@@ -228,7 +228,7 @@ class HomeFragment : Fragment() {
             if (cityId != null && cityId != 0) {
                 homeViewModel.refreshData(latitude, longitude, cityId, isUsingGps, isOnline)
             } else {
-                Log.w("HomeFragment", "No cityId available for refresh")
+                homeViewModel.refreshData(latitude, longitude, null, isUsingGps, isOnline)
             }
         }
         dailyForecastAdapter.setTemperatureUnit(settingsManager.getTemperatureUnit())
