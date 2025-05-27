@@ -123,7 +123,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showMapOverlay() {
-        val dialog = MapSelectionDialogFragment.newInstance { lat, lon ->
+        val dialog = MapSelectionDialogFragment { lat, lon ->
             viewModel.onMapPicked(lat, lon)
         }
         dialog.setCancelable(false)

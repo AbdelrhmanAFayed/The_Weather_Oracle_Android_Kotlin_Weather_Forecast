@@ -22,6 +22,9 @@ import com.example.theweatheroracle.map.MapViewModelFactory
 import com.example.theweatheroracle.model.weather.WeatherRepositoryImp
 import com.example.theweatheroracle.model.api.WeatherRemoteDataSourceImpl
 import com.example.theweatheroracle.model.db.weather.WeatherLocalDataSourceImpl
+import com.example.theweatheroracle.model.map.MapDataSourceImp
+import com.example.theweatheroracle.model.map.MapRetrofitClient
+import com.example.theweatheroracle.model.settings.SettingsManager
 import com.example.theweatheroracle.settings.Settings
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
@@ -42,13 +45,17 @@ class NavActivity : AppCompatActivity() {
 
         setSupportActionBar(binding.appBarNav.toolbar)
 
-        viewModel = ViewModelProvider(this, MapViewModelFactory(WeatherRepositoryImp.getInstance(
-            WeatherRemoteDataSourceImpl,
-            WeatherLocalDataSourceImpl.getInstance(this)
-        )))[MapViewModel::class.java]
+        viewModel = ViewModelProvider(this, MapViewModelFactory(
+            WeatherRepositoryImp.getInstance(
+                WeatherRemoteDataSourceImpl,
+                WeatherLocalDataSourceImpl.getInstance(this)
+            ),
+            SettingsManager(this),
+            MapDataSourceImp
+        ))[MapViewModel::class.java]
 
         binding.appBarNav.fab.setOnClickListener { view ->
-            val mapDialog = MapSelectionDialogFragment.newInstance { lat, lon ->
+            val mapDialog = MapSelectionDialogFragment{ lat, lon ->
                 viewModel.addCityFromMap(lat, lon)
                 Snackbar.make(view, "City added at $lat, $lon", Snackbar.LENGTH_SHORT).show()
             }
