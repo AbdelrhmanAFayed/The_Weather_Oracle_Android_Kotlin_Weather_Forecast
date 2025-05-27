@@ -3,6 +3,7 @@ package com.example.theweatheroracle.model.settings
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.core.content.edit
 
 class SettingsManager(private val context: Context) : ISettingsManager {
@@ -32,7 +33,13 @@ class SettingsManager(private val context: Context) : ISettingsManager {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
     }
 
-    override fun isFirstTime(): Boolean = preferences.getBoolean(KEY_FIRST_TIME, DEFAULT_FIRST_TIME)
+    override fun isFirstTime(): Boolean
+    {
+        val isFirst = preferences.getBoolean(KEY_FIRST_TIME, DEFAULT_FIRST_TIME)
+        Log.d("SettingsManager", "isFirstTime: $isFirst")
+        return isFirst
+
+    }
     override fun setFirstTime(isFirst: Boolean) {
         preferences.edit { putBoolean(KEY_FIRST_TIME, isFirst) }
     }
