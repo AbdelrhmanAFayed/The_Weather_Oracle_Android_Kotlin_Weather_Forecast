@@ -52,6 +52,7 @@ class MainViewModel(
 
     sealed class UiEvent {
         object ShowSetupDialog : UiEvent()
+        object ShowEnableLocationServices   : UiEvent()
         object RequestLocationPermission : UiEvent()
         object LaunchMapPicker : UiEvent()
         data class NavigateToNav(val lat: Double, val lon: Double) : UiEvent()
@@ -70,7 +71,8 @@ class MainViewModel(
     }
 
     fun onSplashEnd() {
-        if (isFirstTime.value == true) {
+        if (settingsManager.isFirstTime()) {
+            _isFirstTime.value = settingsManager.isFirstTime()
             _uiEvent.value = UiEvent.ShowSetupDialog
             return
         }
@@ -82,12 +84,19 @@ class MainViewModel(
                 proceedWithLocation()
             }
         } else {
-            _uiEvent.value = UiEvent.LaunchMapPicker
+            val lat = latitude.value
+            val lon = longitude.value
+            if (lat != null && lon != null) {
+                saveAndNavigate(lat, lon)
+            } else {
+                _uiEvent.value = UiEvent.LaunchMapPicker
+            }
         }
     }
 
     fun onSetupConfirmed(useGps: Boolean, notifyEnabled: Boolean) {
         settingsManager.setFirstTime(false)
+        _isFirstTime.value = false
         settingsManager.setLocation(if (useGps) "gps" else "map")
         settingsManager.setNotifications(if (notifyEnabled) "enable" else "disable")
         _useGPS.value = useGps
@@ -101,6 +110,7 @@ class MainViewModel(
             proceedWithLocation()
         } else {
             _uiEvent.value = UiEvent.ShowError("Location permission denied.")
+            settingsManager.setLocation("map")
         }
     }
 
@@ -108,17 +118,24 @@ class MainViewModel(
         saveAndNavigate(lat, lon)
     }
 
-    private fun proceedWithLocation() {
+    fun proceedWithLocation() {
         viewModelScope.launch {
             try {
+                if (!locationDataSource.isLocationServiceEnabled()) {
+                    _uiEvent.value = UiEvent.ShowEnableLocationServices
+                    return@launch
+                }
+
                 val loc = withContext(Dispatchers.IO) {
                     locationDataSource.getLastKnownLocation()
                 }
+
                 if (loc != null) {
                     saveAndNavigate(loc.latitude, loc.longitude)
                 } else {
                     _uiEvent.value = UiEvent.LaunchMapPicker
                 }
+
             } catch (e: Exception) {
                 _uiEvent.value = UiEvent.ShowError("Failed to fetch location: ${e.message}")
             }
@@ -133,5 +150,8 @@ class MainViewModel(
         _uiEvent.value = UiEvent.NavigateToNav(lat, lon)
     }
 
-
+    fun onLocationServicesDeclined() {
+        settingsManager.setLocation("map")
+        _uiEvent.value = UiEvent.LaunchMapPicker
+    }
 }
