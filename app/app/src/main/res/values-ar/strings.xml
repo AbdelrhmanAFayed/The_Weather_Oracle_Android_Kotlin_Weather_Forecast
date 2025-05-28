@@ -7,7 +7,6 @@
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">رأس التنقل</string>
     <string name="action_settings">الإعدادات</string>
-
     <string name="menu_home">الرئيسية</string>
     <string name="menu_gallery">معرض الصور</string>
     <string name="menu_slideshow">عرض الشرائح</string>
@@ -43,10 +42,23 @@
     <string name="alerts">التنبيهات</string>
     <string name="favourites">المفضلة</string>
     <string name="settings">الإعدادات</string>
-
+    <string name="refresh">تحديث</string>
     <string name="data_shown_for_n_a">البيانات المعروضة لـ: غير متاح</string>
     <string name="unknown">غير معروف</string>
     <string name="confirm_language_change">تأكيد تغيير اللغة</string>
     <string name="changing_the_language_will_restart_the_app_proceed">تغيير اللغة سيؤدي إلى إعادة تشغيل التطبيق. هل تريد المتابعة؟</string>
     <string name="yes">نعم</string>
+    <string name="data_shown_for_na">آخر تحديث: %s</string>
+    <string name="last_updated_na">آخر تحديث: غير متاح</string>
+    <string name="location_permission_denied">أذونات الموقع مطلوبة لاستخدام GPS. هل ترغب في منح الأذونات أو التبديل إلى اختيار الخريطة؟</string>
+    <string name="location_services_disabled">خدمات الموقع معطلة. يرجى تفعيلها أو التبديل إلى اختيار الخريطة.</string>
+    <string name="grant_permissions">منح الأذونات</string>
+    <string name="use_map">استخدام الخريطة</string>
+    <string name="enable_location">تفعيل الموقع</string>
+    <string name="select_location">اختيار الموقع</string>
+    <string name="confirm_delete_city">هل أنت متأكد من إزالة %s من المفضلة؟</string>
+    <string name="delete">حذف</string>
+    <string name="cancel">إلغاء</string>
+    <string name="city_added">تمت إضافة %s إلى المفضلة</string>
+    <string name="no">لا</string>
 </resources>

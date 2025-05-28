@@ -59,4 +59,11 @@
     <string name="enable_location">Enable Location</string>
     <string name="select_location">Select Location</string>
 
+    <string name="confirm_delete_city">Are you sure you want to remove %s from your favorites?</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
+    <string name="city_added">Added %s to favorites</string>
+    <string name="no">No</string>
+
+
 </resources>
