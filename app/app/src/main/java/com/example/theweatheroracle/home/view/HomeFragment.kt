@@ -111,6 +111,9 @@ class HomeFragment : Fragment() {
         updateLocationData()
         refreshData()
         updateLanguageSettings()
+        dailyForecastAdapter.notifyDataSetChanged()
+        weeklyForecastAdapter.notifyDataSetChanged()
+
     }
 
     private fun setupObservers() {
