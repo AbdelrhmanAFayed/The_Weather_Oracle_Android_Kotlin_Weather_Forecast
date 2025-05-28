@@ -6,6 +6,9 @@ interface INetworkObserver {
 
     fun observe() : Flow<Status>
 
+    fun isOnline(): Boolean
+
+
     enum class Status{
         Available , Unavailable , Losing , Lost
     }

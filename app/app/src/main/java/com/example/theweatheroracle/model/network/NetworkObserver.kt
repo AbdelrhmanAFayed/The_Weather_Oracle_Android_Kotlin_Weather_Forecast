@@ -9,47 +9,37 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
-class NetworkObserver(private val context: Context)
-    : INetworkObserver
-{
-    private val connectiveManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-    override fun observe(): Flow<INetworkObserver.Status> {
 
+class NetworkObserver(private val context: Context) : INetworkObserver {
+    private val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+    override fun observe(): Flow<INetworkObserver.Status> {
         return callbackFlow {
-            val callback = object : ConnectivityManager.NetworkCallback()
-            {
+            val callback = object : ConnectivityManager.NetworkCallback() {
                 override fun onAvailable(network: Network) {
-                    super.onAvailable(network)
-                    launch {
-                        send(INetworkObserver.Status.Available)
-                    }
+                    launch { send(INetworkObserver.Status.Available) }
                 }
 
                 override fun onLosing(network: Network, maxMsToLive: Int) {
-                    super.onLosing(network, maxMsToLive)
-                    launch {
-                        send(INetworkObserver.Status.Losing)
-                    }
+                    launch { send(INetworkObserver.Status.Losing) }
                 }
 
                 override fun onLost(network: Network) {
-                    super.onLost(network)
-                    launch {
-                        send(INetworkObserver.Status.Lost)
-                    }
+                    launch { send(INetworkObserver.Status.Lost) }
                 }
 
                 override fun onUnavailable() {
-                    super.onUnavailable()
-                    launch {
-                        send(INetworkObserver.Status.Unavailable)
-                    }
+                    launch { send(INetworkObserver.Status.Unavailable) }
                 }
             }
-            connectiveManager.registerDefaultNetworkCallback(callback)
-            awaitClose{
-                connectiveManager.unregisterNetworkCallback(callback)
+            connectivityManager.registerDefaultNetworkCallback(callback)
+            awaitClose {
+                connectivityManager.unregisterNetworkCallback(callback)
             }
         }.distinctUntilChanged()
+    }
+
+    override fun isOnline(): Boolean {
+        return connectivityManager.activeNetwork != null
     }
 }
