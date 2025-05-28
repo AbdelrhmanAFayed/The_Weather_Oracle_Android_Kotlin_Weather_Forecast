@@ -49,4 +49,14 @@
     <string name="confirm_language_change">Confirm Language Change</string>
     <string name="changing_the_language_will_restart_the_app_proceed">Changing the language will restart the app. Proceed?</string>
     <string name="yes">Yes</string>
+
+    <string name="data_shown_for_na">Last updated: %s</string>
+    <string name="last_updated_na">Last updated: N/A</string>
+    <string name="location_permission_denied">Location permissions are required to use GPS. Would you like to grant permissions or switch to map selection?</string>
+    <string name="location_services_disabled">Location services are disabled. Please enable them or switch to map selection.</string>
+    <string name="grant_permissions">Grant Permissions</string>
+    <string name="use_map">Use Map</string>
+    <string name="enable_location">Enable Location</string>
+    <string name="select_location">Select Location</string>
+
 </resources>

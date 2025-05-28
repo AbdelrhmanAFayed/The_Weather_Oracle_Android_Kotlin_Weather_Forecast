@@ -6,6 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.theweatheroracle.home.view.DailySummary
+import com.example.theweatheroracle.model.location.LocationDataSource
+import com.example.theweatheroracle.model.network.INetworkObserver
 import com.example.theweatheroracle.model.weather.City
 import com.example.theweatheroracle.model.weather.CurrentRain
 import com.example.theweatheroracle.model.weather.Forecast
@@ -21,11 +23,13 @@ import java.util.TimeZone
 
 class HomeViewModelFactory(
     private val repository: WeatherRepository,
-    private val settingsManager: ISettingsManager
+    private val settingsManager: ISettingsManager,
+    private val locationDataSource: LocationDataSource,
+    private val networkObserver: INetworkObserver
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(HomeViewModel::class.java)) {
-            return HomeViewModel(repository, settingsManager) as T
+            return HomeViewModel(repository, settingsManager, locationDataSource, networkObserver) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
@@ -33,7 +37,9 @@ class HomeViewModelFactory(
 
 class HomeViewModel(
     private val repository: WeatherRepository,
-    private val settingsManager: ISettingsManager
+    private val settingsManager: ISettingsManager,
+    private val locationDataSource: LocationDataSource,
+    private val networkObserver: INetworkObserver
 ) : ViewModel() {
     private val _city = MutableLiveData<City?>()
     val city: LiveData<City?> = _city
@@ -58,55 +64,75 @@ class HomeViewModel(
 
     fun refreshData(latitude: Double, longitude: Double, cityId: Int?, useGps: Boolean, isOnline: Boolean) {
         viewModelScope.launch {
-            if (useGps || cityId == null || cityId == 0) {
-                fetchWeatherData(latitude, longitude, isOnline)
-            } else {
+            if (useGps) {
+                if (!locationDataSource.hasLocationPermission()) {
+                    _weather.postValue(null)
+                    _city.postValue(null)
+                    _dailyForecasts.postValue(emptyList())
+                    _weeklySummaries.postValue(emptyList())
+                    _lastUpdated.postValue(null)
+                    return@launch
+                }
+                if (!locationDataSource.isLocationServiceEnabled()) {
+                    _weather.postValue(null)
+                    _city.postValue(null)
+                    _dailyForecasts.postValue(emptyList())
+                    _weeklySummaries.postValue(emptyList())
+                    _lastUpdated.postValue(null)
+                    return@launch
+                }
+                val location = locationDataSource.getLastKnownLocation()
+                if (location != null) {
+                    fetchWeatherData(location.latitude, location.longitude, isOnline)
+                } else {
+                    fetchWeatherData(latitude, longitude, isOnline) // Fallback to stored coordinates
+                }
+            } else if (cityId != null && cityId != 0) {
                 if (isOnline) {
                     fetchWeatherByCityId(cityId)
                 } else {
                     fetchWeatherByCityIdFromDb(cityId)
                 }
+            } else {
+                fetchWeatherData(latitude, longitude, isOnline)
             }
         }
     }
 
     fun fetchWeatherData(latitude: Double, longitude: Double, isOnline: Boolean) {
         viewModelScope.launch {
-            val forecastResult = repository.fetchWeatherForecast(latitude, longitude)
-            forecastResult.onSuccess { forecastResponse ->
-                _city.postValue(forecastResponse.city)
-                _dailyForecasts.postValue(forecastResponse.list)
-                _weeklySummaries.postValue(computeWeeklySummaries(forecastResponse.list))
-                // Use the timestamp of the first forecast or current time
-                val timestamp = forecastResponse.list.firstOrNull()?.dt ?: (System.currentTimeMillis() / 1000)
-                updateLastUpdatedTimestamp(timestamp)
-            }.onFailure {
-                _city.postValue(null)
-                _dailyForecasts.postValue(emptyList())
-                _weeklySummaries.postValue(emptyList())
-                _lastUpdated.postValue(null)
-            }
-
             if (isOnline) {
+                val forecastResult = repository.fetchWeatherForecast(latitude, longitude)
+                forecastResult.onSuccess { forecastResponse ->
+                    _city.postValue(forecastResponse.city)
+                    _dailyForecasts.postValue(forecastResponse.list)
+                    _weeklySummaries.postValue(computeWeeklySummaries(forecastResponse.list))
+                    val timestamp = forecastResponse.list.firstOrNull()?.dt ?: (System.currentTimeMillis() / 1000)
+                    updateLastUpdatedTimestamp(timestamp)
+                }.onFailure {
+                    _city.postValue(null)
+                    _dailyForecasts.postValue(emptyList())
+                    _weeklySummaries.postValue(emptyList())
+                    _lastUpdated.postValue(null)
+                }
+
                 val weatherResult = repository.fetchWeatherByLatLon(latitude, longitude)
-                if (weatherResult.isSuccess) {
-                    weatherResult.onSuccess { weatherResponse ->
-                        _weather.postValue(weatherResponse)
-                        _city.postValue(
-                            City(
-                                id = weatherResponse.id,
-                                name = weatherResponse.name,
-                                coord = weatherResponse.coord,
-                                country = weatherResponse.sys.country ?: "",
-                                population = 0,
-                                timezone = weatherResponse.timezone,
-                                sunrise = weatherResponse.sys.sunrise ?: 0,
-                                sunset = weatherResponse.sys.sunset ?: 0
-                            )
+                weatherResult.onSuccess { weatherResponse ->
+                    _weather.postValue(weatherResponse)
+                    _city.postValue(
+                        City(
+                            id = weatherResponse.id,
+                            name = weatherResponse.name,
+                            coord = weatherResponse.coord,
+                            country = weatherResponse.sys.country ?: "",
+                            population = 0,
+                            timezone = weatherResponse.timezone,
+                            sunrise = weatherResponse.sys.sunrise ?: 0,
+                            sunset = weatherResponse.sys.sunset ?: 0
                         )
-                        updateLastUpdatedTimestamp(weatherResponse.dt)
-                    }
-                } else {
+                    )
+                    updateLastUpdatedTimestamp(weatherResponse.dt)
+                }.onFailure {
                     val city = _city.value
                     if (city != null) {
                         val currentDt = System.currentTimeMillis() / 1000
@@ -152,24 +178,22 @@ class HomeViewModel(
             }
 
             val weatherResult = repository.fetchWeatherByCityId(cityId)
-            if (weatherResult.isSuccess) {
-                weatherResult.onSuccess { weatherResponse ->
-                    _weather.postValue(weatherResponse)
-                    _city.postValue(
-                        City(
-                            id = weatherResponse.id,
-                            name = weatherResponse.name,
-                            coord = weatherResponse.coord,
-                            country = weatherResponse.sys.country ?: "",
-                            population = 0,
-                            timezone = weatherResponse.timezone,
-                            sunrise = weatherResponse.sys.sunrise ?: 0,
-                            sunset = weatherResponse.sys.sunset ?: 0
-                        )
+            weatherResult.onSuccess { weatherResponse ->
+                _weather.postValue(weatherResponse)
+                _city.postValue(
+                    City(
+                        id = weatherResponse.id,
+                        name = weatherResponse.name,
+                        coord = weatherResponse.coord,
+                        country = weatherResponse.sys.country ?: "",
+                        population = 0,
+                        timezone = weatherResponse.timezone,
+                        sunrise = weatherResponse.sys.sunrise ?: 0,
+                        sunset = weatherResponse.sys.sunset ?: 0
                     )
-                    updateLastUpdatedTimestamp(weatherResponse.dt)
-                }
-            } else {
+                )
+                updateLastUpdatedTimestamp(weatherResponse.dt)
+            }.onFailure {
                 val city = _city.value
                 if (city != null) {
                     val currentDt = System.currentTimeMillis() / 1000
