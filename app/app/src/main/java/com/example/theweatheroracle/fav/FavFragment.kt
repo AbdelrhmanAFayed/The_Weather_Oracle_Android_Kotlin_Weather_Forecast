@@ -1,11 +1,12 @@
 package com.example.theweatheroracle.fav
 
-import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.theweatheroracle.R
 import com.example.theweatheroracle.databinding.FragmentFavBinding
+import com.example.theweatheroracle.nav.SharedViewModel
 import com.example.theweatheroracle.model.weather.WeatherRepositoryImp
 import com.example.theweatheroracle.model.api.WeatherRemoteDataSourceImpl
 import com.example.theweatheroracle.model.db.weather.WeatherLocalDataSourceImpl
@@ -25,6 +27,7 @@ class FavFragment : Fragment() {
     private lateinit var viewModel: FavouritesViewModel
     private lateinit var adapter: FavouritesAdapter
     private lateinit var settingsManager: ISettingsManager
+    private lateinit var sharedViewModel: SharedViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,6 +40,7 @@ class FavFragment : Fragment() {
             settingsManager
         )
         viewModel = ViewModelProvider(this, factory)[FavouritesViewModel::class.java]
+        sharedViewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
     }
 
     override fun onCreateView(
@@ -48,7 +52,6 @@ class FavFragment : Fragment() {
         return binding.root
     }
 
-    @SuppressLint("NotifyDataSetChanged")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -59,7 +62,6 @@ class FavFragment : Fragment() {
             },
             settingsManager = settingsManager
         )
-
 
         binding.favouritesRecyclerView.apply {
             layoutManager = LinearLayoutManager(context)
@@ -76,20 +78,37 @@ class FavFragment : Fragment() {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val position = viewHolder.adapterPosition
                 val city = adapter.currentList[position].city
-                viewModel.removeCityFromFavorites(city.id)
+                AlertDialog.Builder(requireContext())
+                    .setMessage(getString(R.string.confirm_delete_city, city.name))
+                    .setPositiveButton(R.string.delete) { _, _ ->
+                        viewModel.removeCityFromFavorites(city.id)
+                        Log.d("FavFragment", "Deleted city: ${city.name}, id: ${city.id}")
+                    }
+                    .setNegativeButton(R.string.cancel) { _, _ ->
+                        adapter.notifyItemChanged(position)
+                        Log.d("FavFragment", "Cancelled deletion for city: ${city.name}")
+                    }
+                    .setCancelable(false)
+                    .show()
             }
         }
         ItemTouchHelper(swipeToDeleteCallback).attachToRecyclerView(binding.favouritesRecyclerView)
 
         viewModel.favoriteCities.observe(viewLifecycleOwner) { cities ->
+            Log.d("FavFragment", "Favorite cities updated: ${cities.map { it.city.name }}")
             adapter.submitList(cities)
-            adapter.notifyDataSetChanged()
+
+        }
+
+        sharedViewModel.refreshFavorites.observe(viewLifecycleOwner) {
+            Log.d("FavFragment", "RefreshFavorites observed: Fetching favorite cities")
+            viewModel.fetchFavoriteCities()
         }
     }
+
     override fun onResume() {
         super.onResume()
+        Log.d("FavFragment", "onResume: Fetching favorite cities")
         viewModel.fetchFavoriteCities()
     }
-
-
 }

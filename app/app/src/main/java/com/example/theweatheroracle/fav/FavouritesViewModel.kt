@@ -41,7 +41,7 @@ class FavouritesViewModel(
     fun fetchFavoriteCities() {
         viewModelScope.launch {
             val cities = repository.getAllCities()
-            val citiesWithTemps = cities.mapNotNull { city ->
+            val citiesWithTemps = cities.map { city ->
                 val forecasts = repository.getForecastsForCity(city.id)
                 val latestForecast = forecasts.minByOrNull { it.dt }
                 if (latestForecast != null) {
