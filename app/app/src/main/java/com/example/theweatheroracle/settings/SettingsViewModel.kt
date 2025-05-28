@@ -21,7 +21,6 @@ class SettingsViewModelFactory(private val settingsManager: ISettingsManager) : 
 
 class SettingsViewModel(private val settingsManager: ISettingsManager) : ViewModel() {
 
-    // LiveData for each setting
     private val _location = MutableLiveData<String>()
     val location: LiveData<String> get() = _location
 

@@ -156,7 +156,7 @@ class Settings : AppCompatActivity() {
                 isDialogVisible = false
                 restartApp()
             }
-            .setNegativeButton("No") { dialog, _ ->
+            .setNegativeButton(getString(R.string.no)) { dialog, _ ->
                 settingsViewModel.language.value?.let { currentLanguage ->
                     binding.languageRadioGroup.check(
                         when (currentLanguage) {
