@@ -2,6 +2,7 @@ package com.example.theweatheroracle.repo
 
 
 import com.example.theweatheroracle.model.weather.*
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -26,39 +27,45 @@ class WeatherRepositoryTest {
             forecastEntities = mutableListOf(),
             weatherEntries = mutableListOf()
         )
-        repository = WeatherRepositoryImp.getInstance(remoteDataSource, localDataSource)
+        runBlocking {
+            localDataSource.saveCity(
+                City(
+                    id = 1,
+                    name = "City1",
+                    coord = Coord(lat = 0.0, lon = 0.0),
+                    country = "US",
+                    population = 100000,
+                    timezone = 0,
+                    sunrise = 0L,
+                    sunset = 0L
+                )
+            )
+            localDataSource.saveCity(
+                City(
+                    id = 2,
+                    name = "City2",
+                    coord = Coord(lat = 1.0, lon = 1.0),
+                    country = "CA",
+                    population = 200000,
+                    timezone = 0,
+                    sunrise = 0L,
+                    sunset = 0L
+                )
+            )
+
+        }
     }
 
     @Test
-    fun deleteAllCities_clearsAllCitiesFromLocalDataSource() = runBlocking {
+    fun deleteAllCities_clearsAllCitiesFromRepo() = runBlocking {
         // Given: A repository with pre-populated cities
-        localDataSource.saveCity(
-            City(
-                id = 1,
-                name = "City1",
-                coord = Coord(lat = 0.0, lon = 0.0),
-                country = "US",
-                population = 100000,
-                timezone = 0,
-                sunrise = 0L,
-                sunset = 0L
-            )
-        )
-        localDataSource.saveCity(
-            City(
-                id = 2,
-                name = "City2",
-                coord = Coord(lat = 1.0, lon = 1.0),
-                country = "CA",
-                population = 200000,
-                timezone = 0,
-                sunrise = 0L,
-                sunset = 0L
-            )
-        )
+        repository = WeatherRepositoryImp.getInstance(remoteDataSource, localDataSource)
 
         // When: deleteAllCities is called
-        repository.deleteAllCities()
+        runBlocking {
+            repository.deleteAllCities()
+            delay(2000)
+        }
 
         // Then: All cities are removed from the local data source
         val cities = localDataSource.getAllCities() // Direct access to verify state
@@ -68,19 +75,10 @@ class WeatherRepositoryTest {
 
     @Test
     fun deleteCityById_removesCityFromLocalDataSource() = runBlocking {
+
         // Given: A repository with a pre-populated city
-        localDataSource.saveCity(
-            City(
-                id = 1,
-                name = "City1",
-                coord = Coord(lat = 0.0, lon = 0.0),
-                country = "US",
-                population = 100000,
-                timezone = 0,
-                sunrise = 0L,
-                sunset = 0L
-            )
-        )
+        repository = WeatherRepositoryImp.getInstance(remoteDataSource, localDataSource)
+
 
 
         // When: deleteCityById is called for cityId 1
@@ -89,6 +87,6 @@ class WeatherRepositoryTest {
         // Then: The city is removed from the local data source
         val cities = localDataSource.getAllCities() // Direct access to verify state
         println("Cities after delete: ${cities.map { it.name to it.id }}")
-        assertEquals(0, cities.size)
+        assertEquals(1, cities.size)
     }
 }

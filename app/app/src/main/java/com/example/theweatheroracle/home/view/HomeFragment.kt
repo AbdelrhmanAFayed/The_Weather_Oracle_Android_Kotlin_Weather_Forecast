@@ -32,6 +32,7 @@ import com.example.theweatheroracle.model.settings.ISettingsManager
 import com.example.theweatheroracle.model.settings.SettingsManager
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -108,11 +109,14 @@ class HomeFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        updateLocationData()
-        refreshData()
-        updateLanguageSettings()
-        dailyForecastAdapter.notifyDataSetChanged()
-        weeklyForecastAdapter.notifyDataSetChanged()
+        lifecycleScope.launch {
+            updateLocationData()
+            refreshData()
+            updateLanguageSettings()
+            dailyForecastAdapter.notifyDataSetChanged()
+            weeklyForecastAdapter.notifyDataSetChanged()
+
+        }
 
     }
 

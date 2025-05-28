@@ -9,9 +9,9 @@ import com.example.theweatheroracle.model.weather.Weather
 import com.example.theweatheroracle.model.weather.WeatherEntryEntity
 
 class FakeWeatherLocalDataSource(
-    private val cities: MutableList<City>,
-    private val forecastEntities: MutableList<ForecastEntity>,
-    private val weatherEntries: MutableList<WeatherEntryEntity>
+    private var cities: MutableList<City>,
+    private var forecastEntities: MutableList<ForecastEntity>,
+    private var weatherEntries: MutableList<WeatherEntryEntity>
 ) : WeatherLocalDataSource {
 
     override suspend fun saveCity(city: City) {
