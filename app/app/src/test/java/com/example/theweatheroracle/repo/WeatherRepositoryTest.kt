@@ -12,21 +12,25 @@ import org.junit.Test
 
 class WeatherRepositoryTest {
 
-    private lateinit var remoteDataSource: FakeWeatherRemoteDataSource
-    private lateinit var localDataSource: FakeWeatherLocalDataSource
+    private val remoteDataSource = FakeWeatherRemoteDataSource(
+        weatherResponses = mutableListOf(),
+        forecastResponses = mutableListOf()
+    )
+    private val localDataSource = FakeWeatherLocalDataSource(
+        cities = mutableListOf(),
+        forecastEntities = mutableListOf(),
+        weatherEntries = mutableListOf()
+    )
     private lateinit var repository: WeatherRepository
 
     @Before
-    fun init() {
-        remoteDataSource = FakeWeatherRemoteDataSource(
-            weatherResponses = mutableListOf(),
-            forecastResponses = mutableListOf()
-        )
-        localDataSource = FakeWeatherLocalDataSource(
-            cities = mutableListOf(),
-            forecastEntities = mutableListOf(),
-            weatherEntries = mutableListOf()
-        )
+    fun setup() {
+        // Clear data source to ensure clean state
+        localDataSource.cities.clear()
+        localDataSource.forecastEntities.clear()
+        localDataSource.weatherEntries.clear()
+
+        // Populate with test data
         runBlocking {
             localDataSource.saveCity(
                 City(
@@ -52,41 +56,41 @@ class WeatherRepositoryTest {
                     sunset = 0L
                 )
             )
-
         }
+
+        // Initialize repository with fresh instance
+        repository = WeatherRepositoryImp.getInstance(remoteDataSource, localDataSource)
+      //  println("Setup complete: Cities = ${localDataSource.getAllCities().map { it.name to it.id }}")
     }
 
     @Test
     fun deleteAllCities_clearsAllCitiesFromRepo() = runBlocking {
         // Given: A repository with pre-populated cities
-        repository = WeatherRepositoryImp.getInstance(remoteDataSource, localDataSource)
+        val initialCities = localDataSource.getAllCities()
+        println("Before deleteAllCities: Cities = ${initialCities.map { it.name to it.id }}")
+        assertEquals("Initial state should have 2 cities", 2, initialCities.size)
 
         // When: deleteAllCities is called
-        runBlocking {
-            repository.deleteAllCities()
-            delay(2000)
-        }
+        repository.deleteAllCities()
 
         // Then: All cities are removed from the local data source
-        val cities = localDataSource.getAllCities() // Direct access to verify state
-        println("Cities after deleteAll: ${cities.map { it.name to it.id }}")
+        val cities = localDataSource.getAllCities()
+        println("After deleteAllCities: Cities = ${cities.map { it.name to it.id }}")
         assertEquals(0, cities.size)
     }
 
     @Test
     fun deleteCityById_removesCityFromLocalDataSource() = runBlocking {
-
-        // Given: A repository with a pre-populated city
-        repository = WeatherRepositoryImp.getInstance(remoteDataSource, localDataSource)
-
-
+        // Given: A repository with pre-populated cities
+        println("Before deleteCityById: Cities = ${localDataSource.getAllCities().map { it.name to it.id }}")
 
         // When: deleteCityById is called for cityId 1
         repository.deleteCityById(1)
 
         // Then: The city is removed from the local data source
-        val cities = localDataSource.getAllCities() // Direct access to verify state
-        println("Cities after delete: ${cities.map { it.name to it.id }}")
+        val cities = localDataSource.getAllCities()
+        println("After deleteCityById: Cities = ${cities.map { it.name to it.id }}")
         assertEquals(1, cities.size)
+        assertEquals("City2", cities.firstOrNull()?.name)
     }
 }

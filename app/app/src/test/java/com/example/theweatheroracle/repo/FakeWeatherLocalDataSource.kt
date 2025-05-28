@@ -8,14 +8,17 @@ import com.example.theweatheroracle.model.weather.ForecastEntity
 import com.example.theweatheroracle.model.weather.Weather
 import com.example.theweatheroracle.model.weather.WeatherEntryEntity
 
+
+
 class FakeWeatherLocalDataSource(
-    private var cities: MutableList<City>,
-    private var forecastEntities: MutableList<ForecastEntity>,
-    private var weatherEntries: MutableList<WeatherEntryEntity>
+    var cities: MutableList<City>,
+    var forecastEntities: MutableList<ForecastEntity>,
+    var weatherEntries: MutableList<WeatherEntryEntity>
 ) : WeatherLocalDataSource {
 
     override suspend fun saveCity(city: City) {
         println("Saving city: ${city.name}, id: ${city.id}")
+        cities.removeAll { it.id == city.id } // Remove existing city with same ID
         cities.add(city)
         println("Cities after save: ${cities.map { it.name to it.id }}")
     }
