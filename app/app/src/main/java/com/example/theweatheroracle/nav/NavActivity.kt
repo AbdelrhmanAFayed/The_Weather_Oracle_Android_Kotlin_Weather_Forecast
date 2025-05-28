@@ -8,6 +8,7 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -28,36 +29,48 @@ import com.example.theweatheroracle.model.settings.SettingsManager
 import com.example.theweatheroracle.settings.Settings
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class NavActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityNavBinding
-    private lateinit var viewModel: MapViewModel
+    private lateinit var mapViewModel: MapViewModel
+    private lateinit var sharedViewModel: SharedViewModel
+    private lateinit var settingsManager: SettingsManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-
 
         binding = ActivityNavBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         setSupportActionBar(binding.appBarNav.toolbar)
 
-        viewModel = ViewModelProvider(this, MapViewModelFactory(
-            WeatherRepositoryImp.getInstance(
-                WeatherRemoteDataSourceImpl,
-                WeatherLocalDataSourceImpl.getInstance(this)
-            ),
-            SettingsManager(this),
-            MapDataSourceImp
-        ))[MapViewModel::class.java]
+        settingsManager = SettingsManager(this)
+
+        mapViewModel = ViewModelProvider(
+            this,
+            MapViewModelFactory(
+                WeatherRepositoryImp.getInstance(
+                    WeatherRemoteDataSourceImpl,
+                    WeatherLocalDataSourceImpl.getInstance(this)
+                ),
+                settingsManager,
+                MapDataSourceImp
+            )
+        )[MapViewModel::class.java]
+
+        sharedViewModel = ViewModelProvider(this)[SharedViewModel::class.java]
 
         binding.appBarNav.fab.setOnClickListener { view ->
-            val mapDialog = MapSelectionDialogFragment{ lat, lon ->
-                viewModel.addCityFromMap(lat, lon)
-                Snackbar.make(view, "City added at $lat, $lon", Snackbar.LENGTH_SHORT).show()
+            val mapDialog = MapSelectionDialogFragment { lat, lon ->
+                mapViewModel.addCityFromMap(lat, lon)
+                lifecycleScope.launch {
+                    delay(500)
+                    sharedViewModel.triggerRefreshFavorites()
+                }
             }
             mapDialog.show(supportFragmentManager, "MapSelectionDialog")
         }
@@ -94,6 +107,7 @@ class NavActivity : AppCompatActivity() {
             else -> super.onOptionsItemSelected(item)
         }
     }
+
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         attachBaseContext(LocaleUtils.updateLocale(this))
